@@ -1,0 +1,16 @@
+# Build output
+build_macos/
+build_x64/
+build_x86_64/
+
+# Downloaded dependencies
+.deps/
+
+# macOS
+.DS_Store
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+install_manifest.txt
