@@ -12,7 +12,7 @@ obs-chalk is a native C++ OBS plugin that replaces obs-draw with a crash-free ob
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Plugin Scaffold and Core Rendering** - OBS plugin loads with a transparent overlay, mutex-protected mark list, and freehand drawing proving the render loop
+- [x] **Phase 1: Plugin Scaffold and Core Rendering** - OBS plugin loads with a transparent overlay, mutex-protected mark list, and freehand drawing proving the render loop (completed 2026-03-30)
 - [ ] **Phase 2: Drawing Tools, Mark Lifecycle, and Hotkeys** - All drawing tools functional, mark management (undo, delete, clear) wired, all primary actions registered as OBS hotkeys
 - [ ] **Phase 3: Qt Dock Panel and Tablet Input** - Dock panel with tool selection and color palette; tablet pressure sensitivity via QTabletEvent
 - [ ] **Phase 4: Polish and Distribution** - Scene-transition clear, codesign/notarize, verification checklist
@@ -29,7 +29,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Clearing all marks results in a clean transparent frame — no crash, no GPU artifacts
   4. All GPU calls happen inside `video_render`; no gs_* calls fire from hotkey or mouse callbacks
   5. Plugin binary builds cleanly against OBS 31.x+ via CMake and loads without error
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 Plans:
 - [ ] 01-01-PLAN.md — Bootstrap build system and plugin source registration as transparent overlay
 - [ ] 01-02-PLAN.md — Object model (Mark, FreehandMark, MarkList) with mouse interaction and render loop
@@ -73,7 +73,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Plugin Scaffold and Core Rendering | 1/2 | In Progress|  |
+| 1. Plugin Scaffold and Core Rendering | 2/2 | Complete   | 2026-03-30 |
 | 2. Drawing Tools, Mark Lifecycle, and Hotkeys | 0/TBD | Not started | - |
 | 3. Qt Dock Panel and Tablet Input | 0/TBD | Not started | - |
 | 4. Polish and Distribution | 0/TBD | Not started | - |

@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: "01-02 Task 3 checkpoint:human-verify — Tasks 1+2 complete, awaiting OBS freehand drawing verification"
-last_updated: "2026-03-30T14:53:14Z"
-last_activity: 2026-03-30 — Plan 01-02 Tasks 1+2 complete, at human-verify checkpoint
+stopped_at: Completed 01-02-PLAN.md — all 3 tasks done, freehand drawing verified in OBS
+last_updated: "2026-03-30T15:14:38.990Z"
+last_activity: 2026-03-30 — Plan 01-02 Tasks 1+2 complete, awaiting freehand drawing OBS verification
 progress:
   total_phases: 4
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 2
-  completed_plans: 1
+  completed_plans: 2
   percent: 50
 ---
 
@@ -50,6 +50,7 @@ Progress: [█████░░░░░] 50%
 - Trend: —
 
 *Updated after each plan completion*
+| Phase 01-plugin-scaffold-and-core-rendering P02 | 14 | 3 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -65,6 +66,9 @@ Recent decisions affecting current work:
 - xcodebuild -runFirstLaunch required on Xcode 26 beta to fix IDESimulatorFoundation symbol crash before cmake configure succeeds
 - All gs_* calls confined to chalk_video_render — established in Plan 01, must be maintained in all future plans
 - OBS 32.x install path: /Applications/OBS.app/Contents/PlugIns/obs-chalk.plugin — user plugins dir is NOT auto-scanned in OBS 32.x
+- [Phase 01-plugin-scaffold-and-core-rendering]: Right-click button type is MOUSE_RIGHT=2 not MOUSE_MIDDLE=1 in OBS SDK
+- [Phase 01-plugin-scaffold-and-core-rendering]: drawing flag on ChalkSource is not mutex-protected — OBS serializes mouse callbacks
+- [Phase 01-plugin-scaffold-and-core-rendering]: Line interpolation deferred to Phase 2 — raw mouse events sufficient for Phase 1 verification
 
 ### Pending Todos
 
@@ -77,6 +81,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-30
-Stopped at: Completed 01-01-PLAN.md — all 3 tasks done, OBS load verified
-Resume file: .planning/phases/01-plugin-scaffold-and-core-rendering/01-02-PLAN.md (Task 3 — continuation after human-verify)
+Last session: 2026-03-30T15:14:38.987Z
+Stopped at: Completed 01-02-PLAN.md — all 3 tasks done, freehand drawing verified in OBS
+Resume file: None

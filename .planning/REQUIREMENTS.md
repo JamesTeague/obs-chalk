@@ -10,9 +10,9 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Core
 
 - [x] **CORE-01**: Plugin registers as an OBS input source that composites as a transparent overlay in the scene
-- [ ] **CORE-02**: Drawing marks are vector objects in a render list, not pixels in a texture buffer
-- [ ] **CORE-03**: Render list is mutex-protected for thread safety between render thread and input callbacks
-- [ ] **CORE-04**: All GPU rendering happens exclusively within `video_render` callback (no `obs_enter_graphics` from other threads)
+- [x] **CORE-02**: Drawing marks are vector objects in a render list, not pixels in a texture buffer
+- [x] **CORE-03**: Render list is mutex-protected for thread safety between render thread and input callbacks
+- [x] **CORE-04**: All GPU rendering happens exclusively within `video_render` callback (no `obs_enter_graphics` from other threads)
 - [x] **CORE-05**: Plugin builds against OBS 31.x+ using obs-plugintemplate and CMake
 
 ### Tools
@@ -90,9 +90,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | CORE-01 | Phase 1 | Complete |
-| CORE-02 | Phase 1 | Pending |
-| CORE-03 | Phase 1 | Pending |
-| CORE-04 | Phase 1 | Pending |
+| CORE-02 | Phase 1 | Complete |
+| CORE-03 | Phase 1 | Complete |
+| CORE-04 | Phase 1 | Complete |
 | CORE-05 | Phase 1 | Complete |
 | TOOL-01 | Phase 2 | Pending |
 | TOOL-02 | Phase 2 | Pending |
