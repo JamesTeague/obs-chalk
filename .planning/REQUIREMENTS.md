@@ -21,19 +21,19 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **TOOL-02**: User can draw arrows by click-drag (multiple end styles available)
 - [x] **TOOL-03**: User can draw circles by click-drag to set center and radius
 - [x] **TOOL-04**: User can place a cone of vision by clicking to set apex, dragging to set direction and width, and releasing to commit
-- [ ] **TOOL-05**: User can activate a laser pointer by holding a key (visible while held, disappears on release, never added to mark list)
+- [x] **TOOL-05**: User can activate a laser pointer by holding a key (visible while held, disappears on release, never added to mark list)
 
 ### Mark Lifecycle
 
-- [ ] **MARK-01**: User can undo the most recent mark via hotkey
-- [ ] **MARK-02**: User can enter pick-to-delete mode, click a specific mark, and remove only that mark
-- [ ] **MARK-03**: User can clear all marks at once via hotkey
-- [ ] **MARK-04**: Multi-level undo (user can undo multiple times to step back through mark history)
+- [x] **MARK-01**: User can undo the most recent mark via hotkey
+- [x] **MARK-02**: User can enter pick-to-delete mode, click a specific mark, and remove only that mark
+- [x] **MARK-03**: User can clear all marks at once via hotkey
+- [x] **MARK-04**: Multi-level undo (user can undo multiple times to step back through mark history)
 
 ### Input
 
-- [ ] **INPT-01**: All primary actions (tool switch, undo, clear, laser toggle, color cycle) are registered as OBS hotkeys
-- [ ] **INPT-02**: User can cycle through a preset color palette via hotkey
+- [x] **INPT-01**: All primary actions (tool switch, undo, clear, laser toggle, color cycle) are registered as OBS hotkeys
+- [x] **INPT-02**: User can cycle through a preset color palette via hotkey
 - [ ] **INPT-03**: Plugin accepts tablet/pen input with pressure sensitivity affecting stroke width
 
 ### UI
@@ -98,13 +98,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TOOL-02 | Phase 2 | Complete |
 | TOOL-03 | Phase 2 | Complete |
 | TOOL-04 | Phase 2 | Complete |
-| TOOL-05 | Phase 2 | Pending |
-| MARK-01 | Phase 2 | Pending |
-| MARK-02 | Phase 2 | Pending |
-| MARK-03 | Phase 2 | Pending |
-| MARK-04 | Phase 2 | Pending |
-| INPT-01 | Phase 2 | Pending |
-| INPT-02 | Phase 2 | Pending |
+| TOOL-05 | Phase 2 | Complete |
+| MARK-01 | Phase 2 | Complete |
+| MARK-02 | Phase 2 | Complete |
+| MARK-03 | Phase 2 | Complete |
+| MARK-04 | Phase 2 | Complete |
+| INPT-01 | Phase 2 | Complete |
+| INPT-02 | Phase 2 | Complete |
 | INPT-03 | Phase 3 | Pending |
 | UI-01 | Phase 3 | Pending |
 | UI-02 | Phase 3 | Pending |

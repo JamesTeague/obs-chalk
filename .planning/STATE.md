@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 02-02-PLAN.md — ArrowMark, CircleMark, ConeMark implemented, build verified
-last_updated: "2026-03-30T17:59:23.666Z"
+stopped_at: Completed 02-03-PLAN.md — Phase 2 fully verified in OBS, all 5 tools and hotkeys functional
+last_updated: "2026-03-30T20:09:18.787Z"
 last_activity: 2026-03-30 — Plan 01-02 Tasks 1+2 complete, awaiting freehand drawing OBS verification
 progress:
   total_phases: 4
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 5
-  completed_plans: 4
+  completed_plans: 5
   percent: 50
 ---
 
@@ -53,6 +53,7 @@ Progress: [█████░░░░░] 50%
 | Phase 01-plugin-scaffold-and-core-rendering P02 | 14 | 3 tasks | 8 files |
 | Phase 02-drawing-tools-mark-lifecycle-and-hotkeys P01 | 2 | 2 tasks | 8 files |
 | Phase 02-drawing-tools-mark-lifecycle-and-hotkeys P02 | 110 | 2 tasks | 7 files |
+| Phase 02-drawing-tools-mark-lifecycle-and-hotkeys P03 | 127 | 2 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -75,6 +76,9 @@ Recent decisions affecting current work:
 - [Phase 02-drawing-tools-mark-lifecycle-and-hotkeys]: CHALK_PALETTE at file scope (not inside ToolState struct): shared constant, not per-instance data
 - [Phase 02-drawing-tools-mark-lifecycle-and-hotkeys]: update_end is virtual no-op on Mark base (not pure virtual): avoids forcing unnecessary overrides on freehand and laser
 - [Phase 02-drawing-tools-mark-lifecycle-and-hotkeys]: ConeMark compute_corner2 extracted as private helper shared by draw() and distance_to() — avoids duplicated reflection math
+- [Phase 02-drawing-tools-mark-lifecycle-and-hotkeys]: Laser is independent of active_tool — laser_active flag renders dot overlay regardless of selected tool
+- [Phase 02-drawing-tools-mark-lifecycle-and-hotkeys]: pick_delete_mode auto-exits after single deletion — avoids user needing to press hotkey again
+- [Phase 02-drawing-tools-mark-lifecycle-and-hotkeys]: delete_closest threshold set to 20px — generous enough for click accuracy, specific enough for dense marks
 
 ### Pending Todos
 
@@ -87,6 +91,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-30T17:59:23.663Z
-Stopped at: Completed 02-02-PLAN.md — ArrowMark, CircleMark, ConeMark implemented, build verified
+Last session: 2026-03-30T20:09:18.784Z
+Stopped at: Completed 02-03-PLAN.md — Phase 2 fully verified in OBS, all 5 tools and hotkeys functional
 Resume file: None

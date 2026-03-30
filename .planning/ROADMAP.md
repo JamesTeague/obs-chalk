@@ -13,7 +13,7 @@ obs-chalk is a native C++ OBS plugin that replaces obs-draw with a crash-free ob
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Plugin Scaffold and Core Rendering** - OBS plugin loads with a transparent overlay, mutex-protected mark list, and freehand drawing proving the render loop (completed 2026-03-30)
-- [ ] **Phase 2: Drawing Tools, Mark Lifecycle, and Hotkeys** - All drawing tools functional, mark management (undo, delete, clear) wired, all primary actions registered as OBS hotkeys
+- [x] **Phase 2: Drawing Tools, Mark Lifecycle, and Hotkeys** - All drawing tools functional, mark management (undo, delete, clear) wired, all primary actions registered as OBS hotkeys (completed 2026-03-30)
 - [ ] **Phase 3: Qt Dock Panel and Tablet Input** - Dock panel with tool selection and color palette; tablet pressure sensitivity via QTabletEvent
 - [ ] **Phase 4: Polish and Distribution** - Scene-transition clear, codesign/notarize, verification checklist
 
@@ -44,7 +44,7 @@ Plans:
   3. User can undo the most recent mark and step back through multiple marks via repeated undo hotkey
   4. User can enter pick-to-delete mode, click a specific mark, and remove only that mark
   5. All primary actions (tool switch, undo, clear-all, laser toggle, color cycle) are registered OBS hotkeys and appear in OBS hotkey settings
-**Plans:** 3 plans
+**Plans:** 3/3 plans complete
 Plans:
 - [ ] 02-01-PLAN.md — Expand interfaces (Mark base, ToolState, MarkList, ChalkSource) and freehand interpolation
 - [ ] 02-02-PLAN.md — ArrowMark, CircleMark, and ConeMark implementations
@@ -78,6 +78,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Plugin Scaffold and Core Rendering | 2/2 | Complete   | 2026-03-30 |
-| 2. Drawing Tools, Mark Lifecycle, and Hotkeys | 0/3 | Planning complete | - |
+| 2. Drawing Tools, Mark Lifecycle, and Hotkeys | 3/3 | Complete   | 2026-03-30 |
 | 3. Qt Dock Panel and Tablet Input | 0/TBD | Not started | - |
 | 4. Polish and Distribution | 0/TBD | Not started | - |
