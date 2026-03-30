@@ -144,8 +144,8 @@ static void chalk_mouse_click(void *data,
         }
     }
 
-    // Right button (type 1) — clear all marks (Phase 1 verification aid)
-    if (type == 1 && !mouse_up) {
+    // Right button (type 2) — clear all marks (Phase 1 verification aid)
+    if (type == 2 && !mouse_up) {
         ctx->mark_list.clear_all();
         ctx->drawing = false;
     }
