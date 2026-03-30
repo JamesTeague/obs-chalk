@@ -31,8 +31,8 @@ Decimal phases appear between their surrounding integers in numeric order.
   5. Plugin binary builds cleanly against OBS 31.x+ via CMake and loads without error
 **Plans:** 2/2 plans complete
 Plans:
-- [ ] 01-01-PLAN.md — Bootstrap build system and plugin source registration as transparent overlay
-- [ ] 01-02-PLAN.md — Object model (Mark, FreehandMark, MarkList) with mouse interaction and render loop
+- [x] 01-01-PLAN.md — Bootstrap build system and plugin source registration as transparent overlay
+- [x] 01-02-PLAN.md — Object model (Mark, FreehandMark, MarkList) with mouse interaction and render loop
 
 ### Phase 2: Drawing Tools, Mark Lifecycle, and Hotkeys
 **Goal**: Users can draw all tool types, manage marks via undo/delete/clear, and control everything via OBS hotkeys
@@ -44,7 +44,11 @@ Plans:
   3. User can undo the most recent mark and step back through multiple marks via repeated undo hotkey
   4. User can enter pick-to-delete mode, click a specific mark, and remove only that mark
   5. All primary actions (tool switch, undo, clear-all, laser toggle, color cycle) are registered OBS hotkeys and appear in OBS hotkey settings
-**Plans**: TBD
+**Plans:** 3 plans
+Plans:
+- [ ] 02-01-PLAN.md — Expand interfaces (Mark base, ToolState, MarkList, ChalkSource) and freehand interpolation
+- [ ] 02-02-PLAN.md — ArrowMark, CircleMark, and ConeMark implementations
+- [ ] 02-03-PLAN.md — Hotkeys, tool routing, laser pointer, pick-to-delete, color cycle, and OBS verification
 
 ### Phase 3: Qt Dock Panel and Tablet Input
 **Goal**: Users can control tools and color from a persistent OBS dock panel, and tablet pressure varies stroke width
@@ -74,6 +78,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Plugin Scaffold and Core Rendering | 2/2 | Complete   | 2026-03-30 |
-| 2. Drawing Tools, Mark Lifecycle, and Hotkeys | 0/TBD | Not started | - |
+| 2. Drawing Tools, Mark Lifecycle, and Hotkeys | 0/3 | Planning complete | - |
 | 3. Qt Dock Panel and Tablet Input | 0/TBD | Not started | - |
 | 4. Polish and Distribution | 0/TBD | Not started | - |
