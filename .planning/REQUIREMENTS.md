@@ -45,6 +45,11 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [ ] **INTG-01**: Optional clear-on-scene-transition (off by default, configurable in source settings)
 
+### Distribution
+
+- [ ] **DIST-01**: macOS universal binary (Intel + Apple Silicon)
+- [ ] **DIST-02**: Windows x64 build
+
 ## v2 Requirements
 
 Deferred to future release. Tracked but not in current roadmap.
@@ -64,8 +69,6 @@ Deferred to future release. Tracked but not in current roadmap.
 
 ### Distribution
 
-- **DIST-01**: macOS universal binary (Intel + Apple Silicon)
-- **DIST-02**: Windows x64 build
 - **DIST-03**: Published to OBS plugin repository
 
 ## Out of Scope
@@ -106,10 +109,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | UI-01 | Phase 3 | Pending |
 | UI-02 | Phase 3 | Pending |
 | INTG-01 | Phase 4 | Pending |
+| DIST-01 | Phase 4 | Pending |
+| DIST-02 | Phase 4 | Pending |
 
 **Coverage:**
-- v1 requirements: 20 total
-- Mapped to phases: 20
+- v1 requirements: 22 total
+- Mapped to phases: 22
 - Unmapped: 0 ✓
 
 ---

@@ -57,12 +57,13 @@ Plans:
 **Plans**: TBD
 
 ### Phase 4: Polish and Distribution
-**Goal**: The plugin is ready for real stream use with scene-transition clear and codesigned macOS distribution
+**Goal**: The plugin is ready for real stream use on both macOS and Windows with scene-transition clear and platform builds
 **Depends on**: Phase 3
-**Requirements**: INTG-01
+**Requirements**: INTG-01, DIST-01, DIST-02
 **Success Criteria** (what must be TRUE):
   1. When the optional clear-on-scene-transition setting is enabled, switching scenes removes all marks; with it disabled, marks persist across scene switches
   2. macOS build is codesigned and notarized; plugin installs from a .pkg or .zip without Gatekeeper warnings
+  3. Windows x64 build produces a loadable plugin DLL that installs and runs in OBS on the streaming machine
 **Plans**: TBD
 
 ## Progress
