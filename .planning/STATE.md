@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 02-01-PLAN.md — both tasks done, interfaces expanded, freehand interpolation active
-last_updated: "2026-03-30T17:56:08.572Z"
+stopped_at: Completed 02-02-PLAN.md — ArrowMark, CircleMark, ConeMark implemented, build verified
+last_updated: "2026-03-30T17:59:23.666Z"
 last_activity: 2026-03-30 — Plan 01-02 Tasks 1+2 complete, awaiting freehand drawing OBS verification
 progress:
   total_phases: 4
   completed_phases: 1
   total_plans: 5
-  completed_plans: 3
+  completed_plans: 4
   percent: 50
 ---
 
@@ -52,6 +52,7 @@ Progress: [█████░░░░░] 50%
 *Updated after each plan completion*
 | Phase 01-plugin-scaffold-and-core-rendering P02 | 14 | 3 tasks | 8 files |
 | Phase 02-drawing-tools-mark-lifecycle-and-hotkeys P01 | 2 | 2 tasks | 8 files |
+| Phase 02-drawing-tools-mark-lifecycle-and-hotkeys P02 | 110 | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -73,6 +74,7 @@ Recent decisions affecting current work:
 - [Phase 02-drawing-tools-mark-lifecycle-and-hotkeys]: distance_to replaces hit_test on Mark base: returning float distance rather than bool enables pick-to-delete with threshold
 - [Phase 02-drawing-tools-mark-lifecycle-and-hotkeys]: CHALK_PALETTE at file scope (not inside ToolState struct): shared constant, not per-instance data
 - [Phase 02-drawing-tools-mark-lifecycle-and-hotkeys]: update_end is virtual no-op on Mark base (not pure virtual): avoids forcing unnecessary overrides on freehand and laser
+- [Phase 02-drawing-tools-mark-lifecycle-and-hotkeys]: ConeMark compute_corner2 extracted as private helper shared by draw() and distance_to() — avoids duplicated reflection math
 
 ### Pending Todos
 
@@ -85,6 +87,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-30T17:56:08.569Z
-Stopped at: Completed 02-01-PLAN.md — both tasks done, interfaces expanded, freehand interpolation active
+Last session: 2026-03-30T17:59:23.663Z
+Stopped at: Completed 02-02-PLAN.md — ArrowMark, CircleMark, ConeMark implemented, build verified
 Resume file: None

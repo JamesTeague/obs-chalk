@@ -18,9 +18,9 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Tools
 
 - [x] **TOOL-01**: User can draw freehand strokes with mouse movement
-- [ ] **TOOL-02**: User can draw arrows by click-drag (multiple end styles available)
-- [ ] **TOOL-03**: User can draw circles by click-drag to set center and radius
-- [ ] **TOOL-04**: User can place a cone of vision by clicking to set apex, dragging to set direction and width, and releasing to commit
+- [x] **TOOL-02**: User can draw arrows by click-drag (multiple end styles available)
+- [x] **TOOL-03**: User can draw circles by click-drag to set center and radius
+- [x] **TOOL-04**: User can place a cone of vision by clicking to set apex, dragging to set direction and width, and releasing to commit
 - [ ] **TOOL-05**: User can activate a laser pointer by holding a key (visible while held, disappears on release, never added to mark list)
 
 ### Mark Lifecycle
@@ -95,9 +95,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CORE-04 | Phase 1 | Complete |
 | CORE-05 | Phase 1 | Complete |
 | TOOL-01 | Phase 2 | Complete |
-| TOOL-02 | Phase 2 | Pending |
-| TOOL-03 | Phase 2 | Pending |
-| TOOL-04 | Phase 2 | Pending |
+| TOOL-02 | Phase 2 | Complete |
+| TOOL-03 | Phase 2 | Complete |
+| TOOL-04 | Phase 2 | Complete |
 | TOOL-05 | Phase 2 | Pending |
 | MARK-01 | Phase 2 | Pending |
 | MARK-02 | Phase 2 | Pending |
