@@ -38,6 +38,7 @@ key-decisions:
   - "cmake --preset macos downloads obs-studio 31.1.1 + prebuilt deps into .deps/ at configure time — this is expected, not a bug"
   - "xcodebuild -runFirstLaunch required on Xcode 26 beta to fix IDESimulatorFoundation symbol crash before cmake configure succeeds"
   - "cmake 4.3.1 installed (above plan's 3.28-3.30 range) — no issues encountered, configure and build succeed"
+  - "OBS 32.x install path: plugin must go to /Applications/OBS.app/Contents/PlugIns/obs-chalk.plugin — user plugins dir (~/.../obs-studio/plugins/) is not auto-scanned in OBS 32.x"
 
 patterns-established:
   - "gs_* calls: all graphics API calls confined to chalk_video_render; never call obs_enter_graphics/obs_leave_graphics (already in graphics context)"
@@ -59,8 +60,8 @@ completed: 2026-03-30
 
 - **Duration:** ~60 min
 - **Started:** 2026-03-30T13:26:24Z
-- **Completed:** 2026-03-30T14:30:00Z
-- **Tasks:** 2 of 3 complete (Task 3 is human-verify checkpoint)
+- **Completed:** 2026-03-30T14:39:05Z
+- **Tasks:** 3 of 3 complete
 - **Files modified:** 8 source/config files created
 
 ## Accomplishments
@@ -74,7 +75,7 @@ completed: 2026-03-30
 
 1. **Task 1: Bootstrap build system from obs-plugintemplate** - `b2639ea` (chore)
 2. **Task 2: Plugin entry point and ChalkSource transparent overlay** - `bb504e1` (feat)
-3. **Task 3: Verify plugin loads in OBS** - awaiting human verification
+3. **Task 3: Verify plugin loads in OBS** - human-verified (approved)
 
 ## Files Created/Modified
 
@@ -116,8 +117,18 @@ completed: 2026-03-30
 
 ---
 
-**Total deviations:** 2 auto-fixed (2 blocking)
-**Impact on plan:** Both fixes were necessary infrastructure. No scope creep.
+**3. [Human-reported] OBS 32.x requires system plugin directory, not user plugins directory**
+- **Found during:** Task 3 (human verification)
+- **Issue:** Plan specified `~/Library/Application Support/obs-studio/plugins/obs-chalk/bin/` as the install path. OBS 32.x does not auto-scan the user plugins directory.
+- **Fix:** Plugin installed to `/Applications/OBS.app/Contents/PlugIns/obs-chalk.plugin` — the system plugins directory bundled with OBS.app.
+- **Files modified:** None (deployment note, no code change required)
+- **Verification:** Plugin loads, "Chalk Drawing" appears in Add Source, transparent overlay confirmed, interact window opens.
+- **Committed in:** n/a (no code change — documentation only)
+
+---
+
+**Total deviations:** 3 (2 auto-fixed blocking, 1 human-reported install path)
+**Impact on plan:** All fixes were necessary infrastructure or environmental. No scope creep.
 
 ## Issues Encountered
 
@@ -126,27 +137,30 @@ completed: 2026-03-30
 
 ## User Setup Required
 
-**To test the plugin in OBS (Task 3 checkpoint):**
+**To install the plugin for testing in OBS 32.x:**
 
-1. Copy the built plugin bundle to the OBS plugins directory:
-   ```
-   cp -r /Users/jteague/dev/obs-chalk/build_macos/RelWithDebInfo/obs-chalk.plugin \
-     ~/Library/Application\ Support/obs-studio/plugins/obs-chalk/bin/
-   ```
-   (Create the `bin/` subdirectory first if it doesn't exist)
+OBS 32.x does NOT auto-scan `~/Library/Application Support/obs-studio/plugins/`. Use the system plugin directory instead:
 
-2. Launch OBS Studio
-3. Sources panel → "+" → verify "Chalk Drawing" appears
-4. Add the source → verify full-canvas transparent overlay (sources behind it visible)
-5. Right-click source → "Interact" → interaction window should open
-6. Check OBS log (Help > Log Files) for any load errors
+```bash
+cp -r /Users/jteague/dev/obs-chalk/build_macos/RelWithDebInfo/obs-chalk.plugin \
+  /Applications/OBS.app/Contents/PlugIns/obs-chalk.plugin
+```
+
+After each build, repeat the copy. The cmake install target should be updated to point here for developer convenience.
+
+Verified steps:
+1. Launch OBS Studio
+2. Sources panel → "+" → "Chalk Drawing" appears in list
+3. Add source → full-canvas transparent overlay (sources behind it visible)
+4. Right-click source → "Interact" → interaction window opens
+5. Check OBS log (Help > Log Files) for any load errors
 
 ## Next Phase Readiness
 
 - Build system and source registration invariants established — Plan 02 can add MarkList and freehand drawing
 - OBS_SOURCE_TYPE_INPUT, OBS_SOURCE_CUSTOM_DRAW, OBS_SOURCE_INTERACTION flags confirmed in chalk_source_info
 - gs_* confinement pattern established: all graphics calls stay inside chalk_video_render
-- Awaiting Task 3 human verification of OBS plugin load before marking Plan 01 complete
+- Task 3 human verification complete: plugin loads in OBS 32.x, transparent overlay confirmed, interact window opens — Plan 01 complete
 
 ---
 *Phase: 01-plugin-scaffold-and-core-rendering*
