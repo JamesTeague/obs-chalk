@@ -1,7 +1,11 @@
 #include "chalk-source.hpp"
 #include "marks/freehand-mark.hpp"
+#include "marks/arrow-mark.hpp"
+#include "marks/circle-mark.hpp"
+#include "marks/cone-mark.hpp"
 #include <obs-module.h>
 #include <mutex>
+#include <cmath>
 
 // ---------------------------------------------------------------------------
 // Forward declarations
@@ -56,6 +60,85 @@ static void color_uint32_to_rgba(uint32_t abgr,
 }
 
 // ---------------------------------------------------------------------------
+// Hotkey callbacks
+// ---------------------------------------------------------------------------
+
+// Undo: remove most recent committed mark (MARK-01, MARK-04)
+static void chalk_hotkey_undo(void *data, obs_hotkey_id,
+                               obs_hotkey_t *, bool pressed)
+{
+    if (!pressed) return;
+    auto *ctx = static_cast<ChalkSource *>(data);
+    ctx->mark_list.undo_mark();
+}
+
+// Clear all: remove every mark (MARK-03)
+static void chalk_hotkey_clear(void *data, obs_hotkey_id,
+                                obs_hotkey_t *, bool pressed)
+{
+    if (!pressed) return;
+    auto *ctx = static_cast<ChalkSource *>(data);
+    ctx->mark_list.clear_all();
+}
+
+// Color cycle: step through palette (INPT-02)
+static void chalk_hotkey_color(void *data, obs_hotkey_id,
+                                obs_hotkey_t *, bool pressed)
+{
+    if (!pressed) return;
+    auto *ctx = static_cast<ChalkSource *>(data);
+    ctx->tool_state.color_index =
+        (ctx->tool_state.color_index + 1) % CHALK_PALETTE_SIZE;
+}
+
+// Laser pointer: active while key held, off on release (TOOL-05)
+// Does NOT early-return on !pressed — key-up disables the laser.
+static void chalk_hotkey_laser(void *data, obs_hotkey_id,
+                                obs_hotkey_t *, bool pressed)
+{
+    auto *ctx = static_cast<ChalkSource *>(data);
+    ctx->laser_active = pressed;
+}
+
+// Tool selection hotkeys
+static void chalk_hotkey_tool_freehand(void *data, obs_hotkey_id,
+                                        obs_hotkey_t *, bool pressed)
+{
+    if (!pressed) return;
+    static_cast<ChalkSource *>(data)->tool_state.active_tool = ToolType::Freehand;
+}
+
+static void chalk_hotkey_tool_arrow(void *data, obs_hotkey_id,
+                                     obs_hotkey_t *, bool pressed)
+{
+    if (!pressed) return;
+    static_cast<ChalkSource *>(data)->tool_state.active_tool = ToolType::Arrow;
+}
+
+static void chalk_hotkey_tool_circle(void *data, obs_hotkey_id,
+                                      obs_hotkey_t *, bool pressed)
+{
+    if (!pressed) return;
+    static_cast<ChalkSource *>(data)->tool_state.active_tool = ToolType::Circle;
+}
+
+static void chalk_hotkey_tool_cone(void *data, obs_hotkey_id,
+                                    obs_hotkey_t *, bool pressed)
+{
+    if (!pressed) return;
+    static_cast<ChalkSource *>(data)->tool_state.active_tool = ToolType::Cone;
+}
+
+// Pick-to-delete: toggle mode (MARK-02 entry)
+static void chalk_hotkey_pick_delete(void *data, obs_hotkey_id,
+                                      obs_hotkey_t *, bool pressed)
+{
+    if (!pressed) return;
+    auto *ctx = static_cast<ChalkSource *>(data);
+    ctx->pick_delete_mode = !ctx->pick_delete_mode;
+}
+
+// ---------------------------------------------------------------------------
 // Callbacks
 // ---------------------------------------------------------------------------
 
@@ -66,12 +149,63 @@ static const char *chalk_get_name(void * /* type_data */)
 
 static void *chalk_create(obs_data_t * /* settings */, obs_source_t *source)
 {
-    return new ChalkSource(source);
+    auto *ctx = new ChalkSource(source);
+
+    ctx->hotkey_undo = obs_hotkey_register_source(
+        source, "chalk.undo", "Chalk: Undo",
+        chalk_hotkey_undo, ctx);
+
+    ctx->hotkey_clear = obs_hotkey_register_source(
+        source, "chalk.clear", "Chalk: Clear All",
+        chalk_hotkey_clear, ctx);
+
+    ctx->hotkey_color = obs_hotkey_register_source(
+        source, "chalk.color_next", "Chalk: Next Color",
+        chalk_hotkey_color, ctx);
+
+    ctx->hotkey_laser = obs_hotkey_register_source(
+        source, "chalk.laser", "Chalk: Laser Pointer",
+        chalk_hotkey_laser, ctx);
+
+    ctx->hotkey_tool_freehand = obs_hotkey_register_source(
+        source, "chalk.tool.freehand", "Chalk: Freehand",
+        chalk_hotkey_tool_freehand, ctx);
+
+    ctx->hotkey_tool_arrow = obs_hotkey_register_source(
+        source, "chalk.tool.arrow", "Chalk: Arrow",
+        chalk_hotkey_tool_arrow, ctx);
+
+    ctx->hotkey_tool_circle = obs_hotkey_register_source(
+        source, "chalk.tool.circle", "Chalk: Circle",
+        chalk_hotkey_tool_circle, ctx);
+
+    ctx->hotkey_tool_cone = obs_hotkey_register_source(
+        source, "chalk.tool.cone", "Chalk: Cone",
+        chalk_hotkey_tool_cone, ctx);
+
+    ctx->hotkey_pick_delete = obs_hotkey_register_source(
+        source, "chalk.pick_delete", "Chalk: Pick to Delete",
+        chalk_hotkey_pick_delete, ctx);
+
+    return ctx;
 }
 
 static void chalk_destroy(void *data)
 {
-    delete static_cast<ChalkSource *>(data);
+    auto *ctx = static_cast<ChalkSource *>(data);
+
+    // Unregister all hotkeys before destroying context
+    obs_hotkey_unregister(ctx->hotkey_undo);
+    obs_hotkey_unregister(ctx->hotkey_clear);
+    obs_hotkey_unregister(ctx->hotkey_color);
+    obs_hotkey_unregister(ctx->hotkey_laser);
+    obs_hotkey_unregister(ctx->hotkey_tool_freehand);
+    obs_hotkey_unregister(ctx->hotkey_tool_arrow);
+    obs_hotkey_unregister(ctx->hotkey_tool_circle);
+    obs_hotkey_unregister(ctx->hotkey_tool_cone);
+    obs_hotkey_unregister(ctx->hotkey_pick_delete);
+
+    delete ctx;
 }
 
 static uint32_t chalk_get_width(void * /* data */)
@@ -113,6 +247,31 @@ static void chalk_video_render(void *data, gs_effect_t * /* effect */)
         }
     }
 
+    // Laser pointer: colored circle that follows cursor while hotkey held
+    if (ctx->laser_active) {
+        float lx, ly;
+        {
+            std::lock_guard<std::mutex> lock(ctx->mark_list.mutex);
+            lx = ctx->laser_x;
+            ly = ctx->laser_y;
+        }
+        float r, g, b, a;
+        color_uint32_to_rgba(ctx->tool_state.active_color(), r, g, b, a);
+        vec4 laser_color;
+        vec4_set(&laser_color, r, g, b, 1.0f);
+        gs_effect_set_vec4(color_param, &laser_color);
+        const float LASER_RADIUS   = 8.0f;
+        const int   LASER_SEGMENTS = 16;
+        gs_render_start(false);
+        for (int i = 0; i <= LASER_SEGMENTS; ++i) {
+            float angle = static_cast<float>(i) / LASER_SEGMENTS
+                          * 2.0f * static_cast<float>(M_PI);
+            gs_vertex2f(lx + LASER_RADIUS * cosf(angle),
+                        ly + LASER_RADIUS * sinf(angle));
+        }
+        gs_render_stop(GS_LINESTRIP);
+    }
+
     gs_technique_end_pass(tech);
     gs_technique_end(tech);
 
@@ -125,26 +284,63 @@ static void chalk_mouse_click(void *data,
                               uint32_t /* click_count */)
 {
     auto *ctx = static_cast<ChalkSource *>(data);
+    const float x = static_cast<float>(event->x);
+    const float y = static_cast<float>(event->y);
 
-    // Left button (type 0) — start/commit a freehand stroke
+    // Left button (type 0) — tool-aware draw or pick-to-delete
     if (type == 0) {
+        // Pick-to-delete mode: remove closest mark and auto-exit (MARK-02)
+        if (ctx->pick_delete_mode && !mouse_up) {
+            ctx->mark_list.delete_closest(x, y, 20.0f);
+            ctx->pick_delete_mode = false;
+            return;
+        }
+
         if (!mouse_up) {
-            // Press: begin a new freehand mark with the active color
             float r, g, b, a;
             color_uint32_to_rgba(ctx->tool_state.active_color(), r, g, b, a);
-            auto mark = std::make_unique<FreehandMark>(r, g, b, a);
-            mark->add_point(static_cast<float>(event->x),
-                            static_cast<float>(event->y));
-            ctx->mark_list.begin_mark(std::move(mark));
-            ctx->drawing = true;
+
+            switch (ctx->tool_state.active_tool) {
+                case ToolType::Freehand: {
+                    auto mark = std::make_unique<FreehandMark>(r, g, b, a);
+                    mark->add_point(x, y);
+                    ctx->mark_list.begin_mark(std::move(mark));
+                    ctx->drawing = true;
+                    break;
+                }
+                case ToolType::Arrow: {
+                    // Tail and head start at same point; head updates on drag
+                    auto mark = std::make_unique<ArrowMark>(x, y, x, y, r, g, b, a);
+                    ctx->mark_list.begin_mark(std::move(mark));
+                    ctx->drawing = true;
+                    break;
+                }
+                case ToolType::Circle: {
+                    // Zero radius initially; grows with drag distance
+                    auto mark = std::make_unique<CircleMark>(x, y, 0.f, r, g, b, a);
+                    ctx->mark_list.begin_mark(std::move(mark));
+                    ctx->drawing = true;
+                    break;
+                }
+                case ToolType::Cone: {
+                    // Apex and tip start at same point; tip updates on drag
+                    auto mark = std::make_unique<ConeMark>(x, y, x, y, r, g, b, a);
+                    ctx->mark_list.begin_mark(std::move(mark));
+                    ctx->drawing = true;
+                    break;
+                }
+                case ToolType::Laser:
+                    // Laser is not a mark — no drawing action
+                    break;
+            }
         } else {
-            // Release: commit the in-progress mark to the persistent list
+            // Mouse up: commit the in-progress mark
             ctx->mark_list.commit_mark();
             ctx->drawing = false;
         }
     }
 
-    // Right button (type 2) — clear all marks (Phase 1 verification aid)
+    // Right button (type 2) — clear all (convenience shortcut)
     if (type == 2 && !mouse_up) {
         ctx->mark_list.clear_all();
         ctx->drawing = false;
@@ -156,13 +352,22 @@ static void chalk_mouse_move(void *data,
                              bool mouse_leave)
 {
     auto *ctx = static_cast<ChalkSource *>(data);
+    const float x = static_cast<float>(event->x);
+    const float y = static_cast<float>(event->y);
 
-    if (ctx->drawing && !mouse_leave) {
+    // Always track laser position (read by video_render on render thread)
+    if (!mouse_leave) {
         std::lock_guard<std::mutex> lock(ctx->mark_list.mutex);
-        if (ctx->mark_list.in_progress) {
-            ctx->mark_list.in_progress->add_point(
-                static_cast<float>(event->x),
-                static_cast<float>(event->y));
+        ctx->laser_x = x;
+        ctx->laser_y = y;
+
+        // Update in-progress mark for drag-preview tools
+        if (ctx->drawing && ctx->mark_list.in_progress) {
+            if (ctx->tool_state.active_tool == ToolType::Freehand) {
+                ctx->mark_list.in_progress->add_point(x, y);
+            } else {
+                ctx->mark_list.in_progress->update_end(x, y);
+            }
         }
     }
 }
