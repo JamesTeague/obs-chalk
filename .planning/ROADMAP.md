@@ -29,7 +29,10 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Clearing all marks results in a clean transparent frame — no crash, no GPU artifacts
   4. All GPU calls happen inside `video_render`; no gs_* calls fire from hotkey or mouse callbacks
   5. Plugin binary builds cleanly against OBS 31.x+ via CMake and loads without error
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 01-01-PLAN.md — Bootstrap build system and plugin source registration as transparent overlay
+- [ ] 01-02-PLAN.md — Object model (Mark, FreehandMark, MarkList) with mouse interaction and render loop
 
 ### Phase 2: Drawing Tools, Mark Lifecycle, and Hotkeys
 **Goal**: Users can draw all tool types, manage marks via undo/delete/clear, and control everything via OBS hotkeys
@@ -69,7 +72,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Plugin Scaffold and Core Rendering | 0/TBD | Not started | - |
+| 1. Plugin Scaffold and Core Rendering | 0/2 | Planning complete | - |
 | 2. Drawing Tools, Mark Lifecycle, and Hotkeys | 0/TBD | Not started | - |
 | 3. Qt Dock Panel and Tablet Input | 0/TBD | Not started | - |
 | 4. Polish and Distribution | 0/TBD | Not started | - |
