@@ -12,9 +12,9 @@ class FreehandMark : public Mark {
 public:
     FreehandMark(float r, float g, float b, float a = 1.0f);
 
-    void add_point(float x, float y) override;
-    void draw(gs_eparam_t *color_param) const override;
-    bool hit_test(float x, float y) const override;
+    void  add_point(float x, float y) override;
+    void  draw(gs_eparam_t *color_param) const override;
+    float distance_to(float x, float y) const override;
 
 private:
     std::vector<FreehandPoint> points_;
