@@ -131,7 +131,7 @@ static void chalk_mouse_click(void *data,
         if (!mouse_up) {
             // Press: begin a new freehand mark with the active color
             float r, g, b, a;
-            color_uint32_to_rgba(ctx->tool_state.active_color, r, g, b, a);
+            color_uint32_to_rgba(ctx->tool_state.active_color(), r, g, b, a);
             auto mark = std::make_unique<FreehandMark>(r, g, b, a);
             mark->add_point(static_cast<float>(event->x),
                             static_cast<float>(event->y));

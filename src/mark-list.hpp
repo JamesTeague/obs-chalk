@@ -12,4 +12,6 @@ struct MarkList {
     void begin_mark(std::unique_ptr<Mark> mark);
     void commit_mark();
     void clear_all();
+    void undo_mark();
+    void delete_closest(float x, float y, float threshold);
 };
