@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 01-02-PLAN.md — all 3 tasks done, freehand drawing verified in OBS
-last_updated: "2026-03-30T15:18:55.549Z"
+stopped_at: Completed 02-01-PLAN.md — both tasks done, interfaces expanded, freehand interpolation active
+last_updated: "2026-03-30T17:56:08.572Z"
 last_activity: 2026-03-30 — Plan 01-02 Tasks 1+2 complete, awaiting freehand drawing OBS verification
 progress:
   total_phases: 4
   completed_phases: 1
-  total_plans: 2
-  completed_plans: 2
+  total_plans: 5
+  completed_plans: 3
   percent: 50
 ---
 
@@ -51,6 +51,7 @@ Progress: [█████░░░░░] 50%
 
 *Updated after each plan completion*
 | Phase 01-plugin-scaffold-and-core-rendering P02 | 14 | 3 tasks | 8 files |
+| Phase 02-drawing-tools-mark-lifecycle-and-hotkeys P01 | 2 | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -69,6 +70,9 @@ Recent decisions affecting current work:
 - [Phase 01-plugin-scaffold-and-core-rendering]: Right-click button type is MOUSE_RIGHT=2 not MOUSE_MIDDLE=1 in OBS SDK
 - [Phase 01-plugin-scaffold-and-core-rendering]: drawing flag on ChalkSource is not mutex-protected — OBS serializes mouse callbacks
 - [Phase 01-plugin-scaffold-and-core-rendering]: Line interpolation deferred to Phase 2 — raw mouse events sufficient for Phase 1 verification
+- [Phase 02-drawing-tools-mark-lifecycle-and-hotkeys]: distance_to replaces hit_test on Mark base: returning float distance rather than bool enables pick-to-delete with threshold
+- [Phase 02-drawing-tools-mark-lifecycle-and-hotkeys]: CHALK_PALETTE at file scope (not inside ToolState struct): shared constant, not per-instance data
+- [Phase 02-drawing-tools-mark-lifecycle-and-hotkeys]: update_end is virtual no-op on Mark base (not pure virtual): avoids forcing unnecessary overrides on freehand and laser
 
 ### Pending Todos
 
@@ -81,6 +85,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-30T15:14:38.987Z
-Stopped at: Completed 01-02-PLAN.md — all 3 tasks done, freehand drawing verified in OBS
+Last session: 2026-03-30T17:56:08.569Z
+Stopped at: Completed 02-01-PLAN.md — both tasks done, interfaces expanded, freehand interpolation active
 Resume file: None
