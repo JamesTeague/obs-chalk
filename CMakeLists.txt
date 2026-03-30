@@ -47,6 +47,8 @@ target_sources(
     src/chalk-source.cpp
     src/mark-list.cpp
     src/marks/freehand-mark.cpp
+    src/marks/arrow-mark.cpp
+    src/marks/circle-mark.cpp
 )
 
 target_compile_features(${CMAKE_PROJECT_NAME} PRIVATE cxx_std_17)
