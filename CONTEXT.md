@@ -52,9 +52,14 @@ Each mark is a discrete object in a render list with properties (type, color, po
 - Screen-space overlay — marks are pixel coordinates on the source, they do not track with video movement
 - Primary workflow: pause film, annotate, talk, clear, advance. Drawing on moving video happens but is secondary.
 
+### Preview Interaction
+
+- **Chalk mode** — global hotkey toggles drawing on/off. When active, mouse/pen events on the OBS preview are intercepted by a Qt event filter and routed to mark creation. When inactive, events pass through to normal OBS behavior.
+- Custom cursor indicates chalk mode state.
+
 ### UI
 
-- Qt dock panel in OBS for tool selection and settings
+- Qt dock panel in OBS for tool selection and settings (optional, Phase 5)
 - Hotkeys are the primary interaction method during streaming — the dock is for setup/configuration
 
 ### Scene Transitions

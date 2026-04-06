@@ -36,7 +36,14 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **INPT-02**: User can cycle through a preset color palette via hotkey
 - [ ] **INPT-03**: Plugin accepts tablet/pen input with pressure sensitivity affecting stroke width
 
-### UI
+### Preview Interaction
+
+- [ ] **PREV-01**: Qt event filter on OBS preview widget intercepts mouse/pen events when chalk mode is active
+- [ ] **PREV-02**: Preview widget coordinates are mapped to scene space so marks render at the correct position
+- [ ] **PREV-03**: Global OBS hotkey toggles chalk mode on/off; when off, all preview events pass through to normal OBS behavior
+- [ ] **PREV-04**: Custom cursor indicates when chalk mode is active
+
+### UI (Optional)
 
 - [ ] **UI-01**: Qt dock panel in OBS for tool selection and color palette display
 - [ ] **UI-02**: Dock panel shows current active tool and selected color
@@ -106,15 +113,19 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INPT-01 | Phase 2 | Complete |
 | INPT-02 | Phase 2 | Complete |
 | INPT-03 | Phase 3 | Pending |
-| UI-01 | Phase 3 | Pending |
-| UI-02 | Phase 3 | Pending |
+| PREV-01 | Phase 3 | Pending |
+| PREV-02 | Phase 3 | Pending |
+| PREV-03 | Phase 3 | Pending |
+| PREV-04 | Phase 3 | Pending |
 | INTG-01 | Phase 4 | Pending |
 | DIST-01 | Phase 4 | Pending |
 | DIST-02 | Phase 4 | Pending |
+| UI-01 | Phase 5 (optional) | Pending |
+| UI-02 | Phase 5 (optional) | Pending |
 
 **Coverage:**
-- v1 requirements: 22 total
-- Mapped to phases: 22
+- v1 requirements: 24 total (4 new PREV-*, UI-01/UI-02 moved to optional Phase 5)
+- Mapped to phases: 24
 - Unmapped: 0 ✓
 
 ---
