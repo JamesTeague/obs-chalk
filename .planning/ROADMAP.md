@@ -47,9 +47,9 @@ Plans:
   5. All primary actions (tool switch, undo, clear-all, laser toggle, color cycle) are registered OBS hotkeys and appear in OBS hotkey settings
 **Plans:** 3/3 plans complete
 Plans:
-- [ ] 02-01-PLAN.md — Expand interfaces (Mark base, ToolState, MarkList, ChalkSource) and freehand interpolation
-- [ ] 02-02-PLAN.md — ArrowMark, CircleMark, and ConeMark implementations
-- [ ] 02-03-PLAN.md — Hotkeys, tool routing, laser pointer, pick-to-delete, color cycle, and OBS verification
+- [x] 02-01-PLAN.md — Expand interfaces (Mark base, ToolState, MarkList, ChalkSource) and freehand interpolation
+- [x] 02-02-PLAN.md — ArrowMark, CircleMark, and ConeMark implementations
+- [x] 02-03-PLAN.md — Hotkeys, tool routing, laser pointer, pick-to-delete, color cycle, and OBS verification
 
 ### Phase 3: Preview Interaction
 **Goal**: Users can toggle chalk mode via hotkey and draw directly on the OBS preview without source selection or interaction mode
@@ -61,7 +61,11 @@ Plans:
   3. A global hotkey toggles chalk mode on/off; the preview cursor changes to indicate active state
   4. Drawing with a tablet pen varies stroke width continuously with pen pressure
   5. Existing source interaction callbacks still work as a secondary input path when chalk mode is off
-**Plans**: TBD
+**Plans:** 3 plans
+Plans:
+- [ ] 03-01-PLAN.md — Event filter on OBS preview with coordinate mapping, chalk mode hotkey, and cursor
+- [ ] 03-02-PLAN.md — Tablet pressure sensitivity for variable-width freehand strokes
+- [ ] 03-03-PLAN.md — OBS verification of all Phase 3 requirements
 
 ### Phase 4: Polish and Distribution
 **Goal**: The plugin is ready for real stream use on both macOS and Windows with scene-transition clear and platform builds
@@ -91,6 +95,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 (optional)
 |-------|----------------|--------|-----------|
 | 1. Plugin Scaffold and Core Rendering | 2/2 | Complete   | 2026-03-30 |
 | 2. Drawing Tools, Mark Lifecycle, and Hotkeys | 3/3 | Complete   | 2026-03-30 |
-| 3. Preview Interaction | 0/TBD | Not started | - |
+| 3. Preview Interaction | 0/3 | Not started | - |
 | 4. Polish and Distribution | 0/TBD | Not started | - |
 | 5. Dock Panel (OPTIONAL) | 0/TBD | Not started | - |
