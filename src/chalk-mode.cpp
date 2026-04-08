@@ -22,6 +22,7 @@
 #include <QMouseEvent>
 #include <QTabletEvent>
 #include <QWidget>
+#include <QGuiApplication>
 
 // ---------------------------------------------------------------------------
 // Coordinate mapping
@@ -95,11 +96,10 @@ static ChalkEventFilter   *s_filter               = nullptr;
 
 static void chalk_update_cursor()
 {
-    if (!s_preview) return;
     if (s_chalk_mode_active)
-        s_preview->setCursor(Qt::CrossCursor);
+        QGuiApplication::setOverrideCursor(Qt::CrossCursor);
     else
-        s_preview->unsetCursor();
+        QGuiApplication::restoreOverrideCursor();
 }
 
 // ---------------------------------------------------------------------------

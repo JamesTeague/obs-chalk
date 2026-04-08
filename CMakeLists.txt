@@ -24,6 +24,7 @@ target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE OBS::libobs)
 if(ENABLE_FRONTEND_API)
   find_package(obs-frontend-api REQUIRED)
   target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE OBS::obs-frontend-api)
+  target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE ENABLE_FRONTEND_API)
   # Xcode generator does not always propagate INTERFACE_INCLUDE_DIRECTORIES from
   # imported targets — read the property and add it explicitly.
   get_target_property(_fe_api_includes OBS::obs-frontend-api INTERFACE_INCLUDE_DIRECTORIES)
