@@ -14,7 +14,6 @@ include(helpers)
 add_library(${CMAKE_PROJECT_NAME} MODULE)
 
 # On macOS, link against OBS.app bundled frameworks before any system paths.
-# ENABLE_QT=OFF in Phase 1, but the prefix path must be set now for Phase 3.
 if(APPLE)
   list(PREPEND CMAKE_PREFIX_PATH "/Applications/OBS.app/Contents/Frameworks")
 endif()
@@ -25,6 +24,12 @@ target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE OBS::libobs)
 if(ENABLE_FRONTEND_API)
   find_package(obs-frontend-api REQUIRED)
   target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE OBS::obs-frontend-api)
+  # Xcode generator does not always propagate INTERFACE_INCLUDE_DIRECTORIES from
+  # imported targets — read the property and add it explicitly.
+  get_target_property(_fe_api_includes OBS::obs-frontend-api INTERFACE_INCLUDE_DIRECTORIES)
+  if(_fe_api_includes)
+    target_include_directories(${CMAKE_PROJECT_NAME} SYSTEM PRIVATE ${_fe_api_includes})
+  endif()
 endif()
 
 if(ENABLE_QT)
@@ -38,6 +43,21 @@ if(ENABLE_QT)
     ${CMAKE_PROJECT_NAME}
     PROPERTIES AUTOMOC ON AUTOUIC ON AUTORCC ON
   )
+  # macOS 14+ SDK removed AGL.framework; deps Qt6 .prl files still reference it.
+  # Remove the AGL link dependency from Qt6::Gui to avoid linker failure on macOS 14+.
+  # macOS 14+ SDK removed AGL.framework; Qt6 WrapOpenGL still references it.
+  # Remove AGL from WrapOpenGL link deps to avoid linker failure on macOS 14+.
+  if(APPLE AND TARGET WrapOpenGL::WrapOpenGL)
+    get_target_property(_wrap_link_libs WrapOpenGL::WrapOpenGL INTERFACE_LINK_LIBRARIES)
+    if(_wrap_link_libs)
+      list(REMOVE_ITEM _wrap_link_libs
+        "/System/Library/Frameworks/AGL.framework"
+        "-framework AGL"
+        "AGL")
+      set_target_properties(WrapOpenGL::WrapOpenGL
+        PROPERTIES INTERFACE_LINK_LIBRARIES "${_wrap_link_libs}")
+    endif()
+  endif()
 endif()
 
 target_sources(
