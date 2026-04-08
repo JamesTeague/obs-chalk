@@ -30,7 +30,8 @@ static void color_uint32_to_rgba(uint32_t abgr,
 
 // Begin a stroke: create a mark and mark drawing=true.
 // Called by both source callbacks (chalk_mouse_click) and ChalkEventFilter.
-void chalk_input_begin(ChalkSource *ctx, float x, float y)
+// pressure: 0.0-1.0 from tablet pen; mouse input uses default 1.0 (full width).
+void chalk_input_begin(ChalkSource *ctx, float x, float y, float pressure)
 {
     float r, g, b, a;
     color_uint32_to_rgba(ctx->tool_state.active_color(), r, g, b, a);
@@ -45,7 +46,7 @@ void chalk_input_begin(ChalkSource *ctx, float x, float y)
     switch (ctx->tool_state.active_tool) {
         case ToolType::Freehand: {
             auto mark = std::make_unique<FreehandMark>(r, g, b, a);
-            mark->add_point(x, y);
+            mark->add_point(x, y, pressure);
             ctx->mark_list.begin_mark(std::move(mark));
             ctx->drawing = true;
             break;
@@ -80,7 +81,8 @@ void chalk_input_begin(ChalkSource *ctx, float x, float y)
 }
 
 // Update a stroke in progress (called on mouse/pen move while drawing).
-void chalk_input_move(ChalkSource *ctx, float x, float y)
+// pressure: 0.0-1.0 from tablet pen; mouse input uses default 1.0 (full width).
+void chalk_input_move(ChalkSource *ctx, float x, float y, float pressure)
 {
     std::lock_guard<std::mutex> lock(ctx->mark_list.mutex);
     ctx->laser_x = x;
@@ -88,7 +90,7 @@ void chalk_input_move(ChalkSource *ctx, float x, float y)
 
     if (ctx->drawing && ctx->mark_list.in_progress) {
         if (ctx->tool_state.active_tool == ToolType::Freehand) {
-            ctx->mark_list.in_progress->add_point(x, y);
+            ctx->mark_list.in_progress->add_point(x, y, pressure);
         } else {
             ctx->mark_list.in_progress->update_end(x, y);
         }
