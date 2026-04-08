@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: verifying
-stopped_at: Completed 03-02-PLAN.md — tablet pressure sensitivity, variable-width freehand strokes
-last_updated: "2026-04-08T19:24:42.957Z"
+stopped_at: Completed 03-03-PLAN.md — Phase 3 verification complete, all requirements confirmed in OBS
+last_updated: "2026-04-08T21:15:26.682Z"
 last_activity: 2026-04-08 — Plan 03-01 complete, event filter installed, build clean
 progress:
   total_phases: 5
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 8
-  completed_plans: 7
+  completed_plans: 8
   percent: 50
 ---
 
@@ -56,6 +56,7 @@ Progress: [█████░░░░░] 50%
 | Phase 02-drawing-tools-mark-lifecycle-and-hotkeys P03 | 127 | 2 tasks | 1 files |
 | Phase 03-preview-interaction P01 | 16 | 2 tasks | 8 files |
 | Phase 03-preview-interaction P02 | 3 | 2 tasks | 6 files |
+| Phase 03-preview-interaction P03 | 0 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -88,6 +89,8 @@ Recent decisions affecting current work:
 - [Phase 03-preview-interaction]: FreehandMark uses GS_TRISTRIP perpendicular-offset rendering for variable-width strokes; CHALK_MIN_WIDTH=1.5f/CHALK_MAX_WIDTH=6.0f
 - [Phase 03-preview-interaction]: Ghost-stroke threshold 0.01 on TabletPress prevents hover proximity events from creating invisible strokes
 - [Phase 03-preview-interaction]: Pressure interpolated on STEP=2px intermediate points via lerp to avoid abrupt width jumps on fast strokes
+- [Phase 03-preview-interaction]: target_compile_definitions(ENABLE_FRONTEND_API) must be explicit in CMakeLists.txt — preset cacheVariable does not inject preprocessor symbol into C++ source
+- [Phase 03-preview-interaction]: QGuiApplication::setOverrideCursor required for OBS preview cursor — OBS resets widget cursor on every mouse-move, making widget-level setCursor ineffective
 
 ### Pending Todos
 
@@ -100,6 +103,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-08T19:24:42.954Z
-Stopped at: Completed 03-02-PLAN.md — tablet pressure sensitivity, variable-width freehand strokes
+Last session: 2026-04-08T21:15:26.679Z
+Stopped at: Completed 03-03-PLAN.md — Phase 3 verification complete, all requirements confirmed in OBS
 Resume file: None
