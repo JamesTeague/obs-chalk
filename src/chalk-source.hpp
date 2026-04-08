@@ -3,6 +3,19 @@
 #include "tool-state.hpp"
 #include "mark-list.hpp"
 
+// ---------------------------------------------------------------------------
+// Shared input dispatch — called by both source callbacks and event filter
+// ---------------------------------------------------------------------------
+
+void chalk_input_begin(struct ChalkSource *ctx, float x, float y);
+void chalk_input_move(struct ChalkSource *ctx, float x, float y);
+void chalk_input_end(struct ChalkSource *ctx);
+
+// Returns the first ChalkSource in the current scene, or nullptr
+struct ChalkSource *chalk_find_source();
+
+// ---------------------------------------------------------------------------
+
 struct ChalkSource {
     obs_source_t *source;
     ToolState tool_state;

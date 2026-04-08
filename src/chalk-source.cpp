@@ -4,8 +4,146 @@
 #include "marks/circle-mark.hpp"
 #include "marks/cone-mark.hpp"
 #include <obs-module.h>
+#ifdef ENABLE_FRONTEND_API
+#include <obs-frontend-api.h>
+#endif
 #include <mutex>
 #include <cmath>
+
+// ---------------------------------------------------------------------------
+// Color conversion helper
+// ---------------------------------------------------------------------------
+
+// Converts ABGR uint32 (OBS convention) to float r,g,b,a components.
+static void color_uint32_to_rgba(uint32_t abgr,
+                                  float &r, float &g, float &b, float &a)
+{
+    a = ((abgr >> 24) & 0xFF) / 255.0f;
+    b = ((abgr >> 16) & 0xFF) / 255.0f;
+    g = ((abgr >> 8)  & 0xFF) / 255.0f;
+    r = ((abgr)       & 0xFF) / 255.0f;
+}
+
+// ---------------------------------------------------------------------------
+// Shared input dispatch
+// ---------------------------------------------------------------------------
+
+// Begin a stroke: create a mark and mark drawing=true.
+// Called by both source callbacks (chalk_mouse_click) and ChalkEventFilter.
+void chalk_input_begin(ChalkSource *ctx, float x, float y)
+{
+    float r, g, b, a;
+    color_uint32_to_rgba(ctx->tool_state.active_color(), r, g, b, a);
+
+    // Pick-to-delete mode: remove closest mark and auto-exit
+    if (ctx->pick_delete_mode) {
+        ctx->mark_list.delete_closest(x, y, 20.0f);
+        ctx->pick_delete_mode = false;
+        return;
+    }
+
+    switch (ctx->tool_state.active_tool) {
+        case ToolType::Freehand: {
+            auto mark = std::make_unique<FreehandMark>(r, g, b, a);
+            mark->add_point(x, y);
+            ctx->mark_list.begin_mark(std::move(mark));
+            ctx->drawing = true;
+            break;
+        }
+        case ToolType::Arrow: {
+            auto mark = std::make_unique<ArrowMark>(x, y, x, y, r, g, b, a);
+            ctx->mark_list.begin_mark(std::move(mark));
+            ctx->drawing = true;
+            break;
+        }
+        case ToolType::Circle: {
+            auto mark = std::make_unique<CircleMark>(x, y, 0.f, r, g, b, a);
+            ctx->mark_list.begin_mark(std::move(mark));
+            ctx->drawing = true;
+            break;
+        }
+        case ToolType::Cone: {
+            auto mark = std::make_unique<ConeMark>(x, y, x, y, r, g, b, a);
+            ctx->mark_list.begin_mark(std::move(mark));
+            ctx->drawing = true;
+            break;
+        }
+        case ToolType::Laser:
+            // Laser is not a mark — also update laser position
+            {
+                std::lock_guard<std::mutex> lock(ctx->mark_list.mutex);
+                ctx->laser_x = x;
+                ctx->laser_y = y;
+            }
+            break;
+    }
+}
+
+// Update a stroke in progress (called on mouse/pen move while drawing).
+void chalk_input_move(ChalkSource *ctx, float x, float y)
+{
+    std::lock_guard<std::mutex> lock(ctx->mark_list.mutex);
+    ctx->laser_x = x;
+    ctx->laser_y = y;
+
+    if (ctx->drawing && ctx->mark_list.in_progress) {
+        if (ctx->tool_state.active_tool == ToolType::Freehand) {
+            ctx->mark_list.in_progress->add_point(x, y);
+        } else {
+            ctx->mark_list.in_progress->update_end(x, y);
+        }
+    }
+}
+
+// End a stroke: commit the in-progress mark and clear drawing flag.
+void chalk_input_end(ChalkSource *ctx)
+{
+    ctx->mark_list.commit_mark();
+    ctx->drawing = false;
+}
+
+// ---------------------------------------------------------------------------
+// chalk_find_source — locate the first chalk source in the current scene
+// ---------------------------------------------------------------------------
+
+#ifdef ENABLE_FRONTEND_API
+namespace {
+    struct FindChalkCtx {
+        ChalkSource *found = nullptr;
+    };
+
+    static bool find_chalk_item(obs_scene_t *, obs_sceneitem_t *item, void *data)
+    {
+        auto *fctx = static_cast<FindChalkCtx *>(data);
+        obs_source_t *src = obs_sceneitem_get_source(item);
+        if (!src) return true;
+        const char *id = obs_source_get_id(src);
+        if (id && strcmp(id, "chalk_drawing_source") == 0) {
+            fctx->found = static_cast<ChalkSource *>(obs_obj_get_data(src));
+            return false; // stop enumeration
+        }
+        return true;
+    }
+} // namespace
+#endif
+
+ChalkSource *chalk_find_source()
+{
+#ifdef ENABLE_FRONTEND_API
+    obs_source_t *scene_src = obs_frontend_get_current_scene();
+    if (!scene_src) return nullptr;
+
+    obs_scene_t *scene = obs_scene_from_source(scene_src);
+    FindChalkCtx fctx;
+    if (scene) {
+        obs_scene_enum_items(scene, find_chalk_item, &fctx);
+    }
+    obs_source_release(scene_src);
+    return fctx.found;
+#else
+    return nullptr;
+#endif
+}
 
 // ---------------------------------------------------------------------------
 // Forward declarations
@@ -44,20 +182,6 @@ struct obs_source_info chalk_source_info = {
     .mouse_click = chalk_mouse_click,
     .mouse_move  = chalk_mouse_move,
 };
-
-// ---------------------------------------------------------------------------
-// Color conversion helper
-// ---------------------------------------------------------------------------
-
-// Converts ABGR uint32 (OBS convention) to float r,g,b,a components.
-static void color_uint32_to_rgba(uint32_t abgr,
-                                  float &r, float &g, float &b, float &a)
-{
-    a = ((abgr >> 24) & 0xFF) / 255.0f;
-    b = ((abgr >> 16) & 0xFF) / 255.0f;
-    g = ((abgr >> 8)  & 0xFF) / 255.0f;
-    r = ((abgr)       & 0xFF) / 255.0f;
-}
 
 // ---------------------------------------------------------------------------
 // Hotkey callbacks
@@ -287,60 +411,16 @@ static void chalk_mouse_click(void *data,
     const float x = static_cast<float>(event->x);
     const float y = static_cast<float>(event->y);
 
-    // Left button (type 0) — tool-aware draw or pick-to-delete
+    // Left button (type 0) — delegate to shared input dispatch
     if (type == 0) {
-        // Pick-to-delete mode: remove closest mark and auto-exit (MARK-02)
-        if (ctx->pick_delete_mode && !mouse_up) {
-            ctx->mark_list.delete_closest(x, y, 20.0f);
-            ctx->pick_delete_mode = false;
-            return;
-        }
-
         if (!mouse_up) {
-            float r, g, b, a;
-            color_uint32_to_rgba(ctx->tool_state.active_color(), r, g, b, a);
-
-            switch (ctx->tool_state.active_tool) {
-                case ToolType::Freehand: {
-                    auto mark = std::make_unique<FreehandMark>(r, g, b, a);
-                    mark->add_point(x, y);
-                    ctx->mark_list.begin_mark(std::move(mark));
-                    ctx->drawing = true;
-                    break;
-                }
-                case ToolType::Arrow: {
-                    // Tail and head start at same point; head updates on drag
-                    auto mark = std::make_unique<ArrowMark>(x, y, x, y, r, g, b, a);
-                    ctx->mark_list.begin_mark(std::move(mark));
-                    ctx->drawing = true;
-                    break;
-                }
-                case ToolType::Circle: {
-                    // Zero radius initially; grows with drag distance
-                    auto mark = std::make_unique<CircleMark>(x, y, 0.f, r, g, b, a);
-                    ctx->mark_list.begin_mark(std::move(mark));
-                    ctx->drawing = true;
-                    break;
-                }
-                case ToolType::Cone: {
-                    // Apex and tip start at same point; tip updates on drag
-                    auto mark = std::make_unique<ConeMark>(x, y, x, y, r, g, b, a);
-                    ctx->mark_list.begin_mark(std::move(mark));
-                    ctx->drawing = true;
-                    break;
-                }
-                case ToolType::Laser:
-                    // Laser is not a mark — no drawing action
-                    break;
-            }
+            chalk_input_begin(ctx, x, y);
         } else {
-            // Mouse up: commit the in-progress mark
-            ctx->mark_list.commit_mark();
-            ctx->drawing = false;
+            chalk_input_end(ctx);
         }
     }
 
-    // Right button (type 2) — clear all (convenience shortcut)
+    // Right button (type 2) — clear all (source-interaction-only shortcut)
     if (type == 2 && !mouse_up) {
         ctx->mark_list.clear_all();
         ctx->drawing = false;
@@ -352,22 +432,9 @@ static void chalk_mouse_move(void *data,
                              bool mouse_leave)
 {
     auto *ctx = static_cast<ChalkSource *>(data);
-    const float x = static_cast<float>(event->x);
-    const float y = static_cast<float>(event->y);
-
-    // Always track laser position (read by video_render on render thread)
     if (!mouse_leave) {
-        std::lock_guard<std::mutex> lock(ctx->mark_list.mutex);
-        ctx->laser_x = x;
-        ctx->laser_y = y;
-
-        // Update in-progress mark for drag-preview tools
-        if (ctx->drawing && ctx->mark_list.in_progress) {
-            if (ctx->tool_state.active_tool == ToolType::Freehand) {
-                ctx->mark_list.in_progress->add_point(x, y);
-            } else {
-                ctx->mark_list.in_progress->update_end(x, y);
-            }
-        }
+        const float x = static_cast<float>(event->x);
+        const float y = static_cast<float>(event->y);
+        chalk_input_move(ctx, x, y);
     }
 }
