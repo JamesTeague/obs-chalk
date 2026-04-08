@@ -146,6 +146,7 @@ protected:
                         static_cast<float>(me->position().x()),
                         static_cast<float>(me->position().y()));
                     ChalkSource *ctx = chalk_find_source();
+                    // Mouse has no pressure — uses default 1.0f (full width)
                     if (ctx) chalk_input_begin(ctx, pos.x, pos.y);
                     return true;
                 }
@@ -160,6 +161,7 @@ protected:
                         static_cast<float>(me->position().x()),
                         static_cast<float>(me->position().y()));
                     ChalkSource *ctx = chalk_find_source();
+                    // Mouse has no pressure — uses default 1.0f (full width)
                     if (ctx) chalk_input_move(ctx, pos.x, pos.y);
                     return true;
                 }
@@ -188,16 +190,23 @@ private:
         float wx = static_cast<float>(e->position().x());
         float wy = static_cast<float>(e->position().y());
 
+        // Extract pressure (0.0-1.0). QTabletEvent::pressure() returns qreal.
+        float pressure = static_cast<float>(e->pressure());
+
         vec2 pos = preview_widget_to_scene(s_preview, wx, wy);
         ChalkSource *ctx = chalk_find_source();
 
         if (ctx) {
             switch (e->type()) {
                 case QEvent::TabletPress:
-                    chalk_input_begin(ctx, pos.x, pos.y);
+                    // Suppress ghost strokes: some tablets report hover as pressure-0 press.
+                    // Treat pressure < 0.01 as no-op so invisible strokes are not started.
+                    if (pressure >= 0.01f) {
+                        chalk_input_begin(ctx, pos.x, pos.y, pressure);
+                    }
                     break;
                 case QEvent::TabletMove:
-                    chalk_input_move(ctx, pos.x, pos.y);
+                    chalk_input_move(ctx, pos.x, pos.y, pressure);
                     break;
                 case QEvent::TabletRelease:
                     chalk_input_end(ctx);
