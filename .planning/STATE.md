@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 02-03-PLAN.md — Phase 2 fully verified in OBS, all 5 tools and hotkeys functional
-last_updated: "2026-03-30T20:17:20.639Z"
-last_activity: 2026-03-30 — Plan 01-02 Tasks 1+2 complete, awaiting freehand drawing OBS verification
+stopped_at: Completed 03-01-PLAN.md — Qt event filter on OBS preview, coordinate mapping, global hotkey toggle
+last_updated: "2026-04-08T19:16:19Z"
+last_activity: 2026-04-08 — Plan 03-01 complete (2 tasks, build clean, plugin installed to OBS.app)
 progress:
   total_phases: 4
   completed_phases: 2
-  total_plans: 5
-  completed_plans: 5
-  percent: 50
+  total_plans: 6
+  completed_plans: 6
+  percent: 58
 ---
 
 # Project State
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-23)
 
 **Core value:** Coaches can reliably draw on film during a livestream without the tool crashing or disrupting the broadcast.
-**Current focus:** Phase 1 — Plugin Scaffold and Core Rendering
+**Current focus:** Phase 3 — Preview Interaction
 
 ## Current Position
 
-Phase: 1 of 4 (Plugin Scaffold and Core Rendering)
-Plan: 2 of TBD in current phase (in progress — 01-02 Tasks 1+2 done, at checkpoint)
-Status: In progress — Plan 01-02 at human-verify checkpoint (Task 3 of 3)
-Last activity: 2026-03-30 — Plan 01-02 Tasks 1+2 complete, awaiting freehand drawing OBS verification
+Phase: 3 of 4 (Preview Interaction)
+Plan: 1 of 3 in current phase (complete)
+Status: Completed — Plan 03-01 done, ready for plan 03-02 (tablet pressure) or 03-03 (verification checkpoint)
+Last activity: 2026-04-08 — Plan 03-01 complete, event filter installed, build clean
 
 Progress: [█████░░░░░] 50%
 
@@ -54,6 +54,7 @@ Progress: [█████░░░░░] 50%
 | Phase 02-drawing-tools-mark-lifecycle-and-hotkeys P01 | 2 | 2 tasks | 8 files |
 | Phase 02-drawing-tools-mark-lifecycle-and-hotkeys P02 | 110 | 2 tasks | 7 files |
 | Phase 02-drawing-tools-mark-lifecycle-and-hotkeys P03 | 127 | 2 tasks | 1 files |
+| Phase 03-preview-interaction P01 | 16 | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -79,6 +80,10 @@ Recent decisions affecting current work:
 - [Phase 02-drawing-tools-mark-lifecycle-and-hotkeys]: Laser is independent of active_tool — laser_active flag renders dot overlay regardless of selected tool
 - [Phase 02-drawing-tools-mark-lifecycle-and-hotkeys]: pick_delete_mode auto-exits after single deletion — avoids user needing to press hotkey again
 - [Phase 02-drawing-tools-mark-lifecycle-and-hotkeys]: delete_closest threshold set to 20px — generous enough for click accuracy, specific enough for dense marks
+- [Phase 03-preview-interaction]: CMakePresets.json template preset cacheVariables override CMakeLists.txt options — ENABLE_FRONTEND_API/QT must be set true in preset, not just in CMakeLists.txt
+- [Phase 03-preview-interaction]: Deps Qt6 .prl files reference AGL framework (removed in macOS 14+ SDK) — remove from WrapOpenGL::WrapOpenGL INTERFACE_LINK_LIBRARIES after find_package(Qt6)
+- [Phase 03-preview-interaction]: chalk_mode hotkey registered in FINISHED_LOADING (not obs_module_load) — saved bindings won't persist across OBS restarts; move to obs_module_load if persistence needed
+- [Phase 03-preview-interaction]: Q_OBJECT in .cpp requires #include "chalk-mode.moc" at end of .cpp for AUTOMOC to process it
 
 ### Pending Todos
 
@@ -91,6 +96,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-30T20:09:18.784Z
-Stopped at: Completed 02-03-PLAN.md — Phase 2 fully verified in OBS, all 5 tools and hotkeys functional
+Last session: 2026-04-08T19:16:19Z
+Stopped at: Completed 03-01-PLAN.md — Qt event filter on OBS preview, coordinate mapping, global hotkey toggle
 Resume file: None

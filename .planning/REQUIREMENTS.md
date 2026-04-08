@@ -38,10 +38,10 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Preview Interaction
 
-- [ ] **PREV-01**: Qt event filter on OBS preview widget intercepts mouse/pen events when chalk mode is active
-- [ ] **PREV-02**: Preview widget coordinates are mapped to scene space so marks render at the correct position
-- [ ] **PREV-03**: Global OBS hotkey toggles chalk mode on/off; when off, all preview events pass through to normal OBS behavior
-- [ ] **PREV-04**: Custom cursor indicates when chalk mode is active
+- [x] **PREV-01**: Qt event filter on OBS preview widget intercepts mouse/pen events when chalk mode is active
+- [x] **PREV-02**: Preview widget coordinates are mapped to scene space so marks render at the correct position
+- [x] **PREV-03**: Global OBS hotkey toggles chalk mode on/off; when off, all preview events pass through to normal OBS behavior
+- [x] **PREV-04**: Custom cursor indicates when chalk mode is active
 
 ### UI (Optional)
 
@@ -113,10 +113,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INPT-01 | Phase 2 | Complete |
 | INPT-02 | Phase 2 | Complete |
 | INPT-03 | Phase 3 | Pending |
-| PREV-01 | Phase 3 | Pending |
-| PREV-02 | Phase 3 | Pending |
-| PREV-03 | Phase 3 | Pending |
-| PREV-04 | Phase 3 | Pending |
+| PREV-01 | Phase 3 | Complete |
+| PREV-02 | Phase 3 | Complete |
+| PREV-03 | Phase 3 | Complete |
+| PREV-04 | Phase 3 | Complete |
 | INTG-01 | Phase 4 | Pending |
 | DIST-01 | Phase 4 | Pending |
 | DIST-02 | Phase 4 | Pending |
