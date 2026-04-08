@@ -34,7 +34,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [x] **INPT-01**: All primary actions (tool switch, undo, clear, laser toggle, color cycle) are registered as OBS hotkeys
 - [x] **INPT-02**: User can cycle through a preset color palette via hotkey
-- [ ] **INPT-03**: Plugin accepts tablet/pen input with pressure sensitivity affecting stroke width
+- [x] **INPT-03**: Plugin accepts tablet/pen input with pressure sensitivity affecting stroke width
 
 ### Preview Interaction
 
@@ -112,7 +112,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | MARK-04 | Phase 2 | Complete |
 | INPT-01 | Phase 2 | Complete |
 | INPT-02 | Phase 2 | Complete |
-| INPT-03 | Phase 3 | Pending |
+| INPT-03 | Phase 3 | Complete |
 | PREV-01 | Phase 3 | Complete |
 | PREV-02 | Phase 3 | Complete |
 | PREV-03 | Phase 3 | Complete |

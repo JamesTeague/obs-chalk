@@ -61,7 +61,7 @@ Plans:
   3. A global hotkey toggles chalk mode on/off; the preview cursor changes to indicate active state
   4. Drawing with a tablet pen varies stroke width continuously with pen pressure
   5. Existing source interaction callbacks still work as a secondary input path when chalk mode is off
-**Plans:** 1/3 plans complete
+**Plans:** 2/3 plans executed
 Plans:
 - [x] 03-01-PLAN.md — Event filter on OBS preview with coordinate mapping, chalk mode hotkey, and cursor (completed 2026-04-08)
 - [ ] 03-02-PLAN.md — Tablet pressure sensitivity for variable-width freehand strokes
@@ -95,6 +95,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 (optional)
 |-------|----------------|--------|-----------|
 | 1. Plugin Scaffold and Core Rendering | 2/2 | Complete   | 2026-03-30 |
 | 2. Drawing Tools, Mark Lifecycle, and Hotkeys | 3/3 | Complete   | 2026-03-30 |
-| 3. Preview Interaction | 1/3 | In progress | - |
+| 3. Preview Interaction | 2/3 | In Progress|  |
 | 4. Polish and Distribution | 0/TBD | Not started | - |
 | 5. Dock Panel (OPTIONAL) | 0/TBD | Not started | - |

@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-stopped_at: Completed 03-01-PLAN.md — Qt event filter on OBS preview, coordinate mapping, global hotkey toggle
-last_updated: "2026-04-08T19:16:19Z"
-last_activity: 2026-04-08 — Plan 03-01 complete (2 tasks, build clean, plugin installed to OBS.app)
+status: verifying
+stopped_at: Completed 03-02-PLAN.md — tablet pressure sensitivity, variable-width freehand strokes
+last_updated: "2026-04-08T19:24:42.957Z"
+last_activity: 2026-04-08 — Plan 03-01 complete, event filter installed, build clean
 progress:
-  total_phases: 4
+  total_phases: 5
   completed_phases: 2
-  total_plans: 6
-  completed_plans: 6
-  percent: 58
+  total_plans: 8
+  completed_plans: 7
+  percent: 50
 ---
 
 # Project State
@@ -55,6 +55,7 @@ Progress: [█████░░░░░] 50%
 | Phase 02-drawing-tools-mark-lifecycle-and-hotkeys P02 | 110 | 2 tasks | 7 files |
 | Phase 02-drawing-tools-mark-lifecycle-and-hotkeys P03 | 127 | 2 tasks | 1 files |
 | Phase 03-preview-interaction P01 | 16 | 2 tasks | 8 files |
+| Phase 03-preview-interaction P02 | 3 | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -84,6 +85,9 @@ Recent decisions affecting current work:
 - [Phase 03-preview-interaction]: Deps Qt6 .prl files reference AGL framework (removed in macOS 14+ SDK) — remove from WrapOpenGL::WrapOpenGL INTERFACE_LINK_LIBRARIES after find_package(Qt6)
 - [Phase 03-preview-interaction]: chalk_mode hotkey registered in FINISHED_LOADING (not obs_module_load) — saved bindings won't persist across OBS restarts; move to obs_module_load if persistence needed
 - [Phase 03-preview-interaction]: Q_OBJECT in .cpp requires #include "chalk-mode.moc" at end of .cpp for AUTOMOC to process it
+- [Phase 03-preview-interaction]: FreehandMark uses GS_TRISTRIP perpendicular-offset rendering for variable-width strokes; CHALK_MIN_WIDTH=1.5f/CHALK_MAX_WIDTH=6.0f
+- [Phase 03-preview-interaction]: Ghost-stroke threshold 0.01 on TabletPress prevents hover proximity events from creating invisible strokes
+- [Phase 03-preview-interaction]: Pressure interpolated on STEP=2px intermediate points via lerp to avoid abrupt width jumps on fast strokes
 
 ### Pending Todos
 
@@ -96,6 +100,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-08T19:16:19Z
-Stopped at: Completed 03-01-PLAN.md — Qt event filter on OBS preview, coordinate mapping, global hotkey toggle
+Last session: 2026-04-08T19:24:42.954Z
+Stopped at: Completed 03-02-PLAN.md — tablet pressure sensitivity, variable-width freehand strokes
 Resume file: None
