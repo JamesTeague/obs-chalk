@@ -4,6 +4,20 @@
 #include <cmath>
 #include <limits>
 
+static void draw_thick_segment(float x1, float y1, float x2, float y2, float half_w)
+{
+    float dx = x2 - x1, dy = y2 - y1;
+    float len = std::hypot(dx, dy);
+    if (len < 1e-6f) return;
+    float px = -dy / len, py = dx / len;
+    gs_render_start(false);
+    gs_vertex2f(x1 + px * half_w, y1 + py * half_w);
+    gs_vertex2f(x1 - px * half_w, y1 - py * half_w);
+    gs_vertex2f(x2 + px * half_w, y2 + py * half_w);
+    gs_vertex2f(x2 - px * half_w, y2 - py * half_w);
+    gs_render_stop(GS_TRISTRIP);
+}
+
 ConeMark::ConeMark(float ax, float ay, float cx, float cy,
                    float r, float g, float b, float a)
     : ax_(ax), ay_(ay), cx_(cx), cy_(cy),
@@ -68,6 +82,11 @@ void ConeMark::draw(gs_eparam_t *color_param) const
     gs_vertex2f(c2x, c2y);
     gs_render_stop(GS_TRIS);
     gs_set_cull_mode(GS_BACK);
+
+    // Side edges at 6px width
+    const float HALF_W = 3.0f;
+    draw_thick_segment(ax_, ay_, cx_, cy_, HALF_W);   // apex to corner1
+    draw_thick_segment(ax_, ay_, c2x, c2y, HALF_W);   // apex to corner2
 }
 
 // Point-to-segment distance helper
