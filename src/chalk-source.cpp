@@ -248,6 +248,13 @@ static void chalk_hotkey_tool_cone(void *data, obs_hotkey_id,
     static_cast<ChalkSource *>(data)->tool_state.active_tool = ToolType::Cone;
 }
 
+static void chalk_hotkey_tool_laser(void *data, obs_hotkey_id,
+                                     obs_hotkey_t *, bool pressed)
+{
+    if (!pressed) return;
+    static_cast<ChalkSource *>(data)->tool_state.active_tool = ToolType::Laser;
+}
+
 // Pick-to-delete: toggle mode (MARK-02 entry)
 static void chalk_hotkey_pick_delete(void *data, obs_hotkey_id,
                                       obs_hotkey_t *, bool pressed)
@@ -283,8 +290,8 @@ static void *chalk_create(obs_data_t * /* settings */, obs_source_t *source)
         chalk_hotkey_color, ctx);
 
     ctx->hotkey_tool_laser = obs_hotkey_register_source(
-        source, "chalk.laser", "Chalk: Laser Pointer",
-        chalk_hotkey_laser, ctx);
+        source, "chalk.tool.laser", "Chalk: Laser",
+        chalk_hotkey_tool_laser, ctx);
 
     ctx->hotkey_tool_freehand = obs_hotkey_register_source(
         source, "chalk.tool.freehand", "Chalk: Freehand",
@@ -366,8 +373,8 @@ static void chalk_video_render(void *data, gs_effect_t * /* effect */)
         }
     }
 
-    // Laser pointer: colored circle that follows cursor while hotkey held
-    if (ctx->laser_active) {
+    // Laser pointer: colored circle while Laser tool is selected and mouse held
+    if (ctx->laser_active && ctx->tool_state.active_tool == ToolType::Laser) {
         float lx, ly;
         {
             std::lock_guard<std::mutex> lock(ctx->mark_list.mutex);
