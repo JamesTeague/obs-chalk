@@ -67,6 +67,7 @@ target_sources(
     src/plugin.cpp
     src/chalk-source.cpp
     src/chalk-mode.cpp
+    src/chalk-dock.cpp
     src/mark-list.cpp
     src/marks/freehand-mark.cpp
     src/marks/arrow-mark.cpp

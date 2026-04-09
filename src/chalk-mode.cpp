@@ -10,6 +10,7 @@
 // ENABLE_FRONTEND_API must be ON (set in CMakeLists.txt).
 
 #include "chalk-mode.hpp"
+#include "chalk-dock.hpp"
 #include "chalk-source.hpp"
 
 #include <obs-module.h>
@@ -85,6 +86,7 @@ static vec2 preview_widget_to_scene(QWidget *preview, float event_x, float event
 static QWidget            *s_preview              = nullptr;
 static obs_hotkey_id       s_chalk_mode_hotkey     = OBS_INVALID_HOTKEY_ID;
 static bool                s_chalk_mode_active     = false;
+static ChalkDock          *s_dock                 = nullptr;
 
 // Forward declare filter class
 class ChalkEventFilter;
@@ -100,6 +102,15 @@ static void chalk_update_cursor()
         QGuiApplication::setOverrideCursor(Qt::CrossCursor);
     else
         QGuiApplication::restoreOverrideCursor();
+}
+
+// ---------------------------------------------------------------------------
+// Public accessor — read by ChalkDock::refresh() on Qt main thread
+// ---------------------------------------------------------------------------
+
+bool chalk_mode_is_active()
+{
+    return s_chalk_mode_active;
 }
 
 // ---------------------------------------------------------------------------
@@ -259,10 +270,21 @@ void chalk_mode_install()
         nullptr);
 
     blog(LOG_INFO, "obs-chalk: chalk mode installed on preview widget");
+
+    s_dock = new ChalkDock();
+    obs_frontend_add_dock_by_id("chalk-status",
+                                 obs_module_text("ChalkStatus"),
+                                 s_dock);
+    blog(LOG_INFO, "obs-chalk: chalk dock installed");
 }
 
 void chalk_mode_shutdown()
 {
+    if (s_dock) {
+        obs_frontend_remove_dock("chalk-status");
+        s_dock = nullptr; // OBS owns widget — do NOT delete
+    }
+
     if (s_preview && s_filter) {
         s_preview->removeEventFilter(s_filter);
         // s_filter is parented to s_preview — Qt will delete it when preview is destroyed.
