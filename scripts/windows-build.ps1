@@ -17,8 +17,12 @@ $ErrorActionPreference = "Stop"
 if (-not $SkipInstall) {
     Write-Host "`n=== Checking build tools ===" -ForegroundColor Cyan
 
-    $hasVS = Get-VSSetupInstance -ErrorAction SilentlyContinue |
-        Where-Object { $_.Packages | Where-Object { $_.Id -like "*VCTools*" } }
+    $vsWherePath = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+    $hasVS = $false
+    if (Test-Path $vsWherePath) {
+        $vcTools = & $vsWherePath -latest -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath 2>$null
+        if ($vcTools) { $hasVS = $true }
+    }
 
     if (-not $hasVS) {
         Write-Host "Installing Visual Studio 2022 Build Tools..." -ForegroundColor Yellow
