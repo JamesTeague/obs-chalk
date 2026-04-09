@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: verifying
-stopped_at: Completed 04-02-PLAN.md — cone alpha, persistent delete, laser-as-tool, clear-on-scene-transition
-last_updated: "2026-04-09T03:06:26.566Z"
+stopped_at: Completed 04-03-PLAN.md — all Phase 4 behaviors verified in OBS
+last_updated: "2026-04-09T03:42:39.997Z"
 last_activity: 2026-04-08 — Plan 03-01 complete, event filter installed, build clean
 progress:
   total_phases: 5
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 11
-  completed_plans: 10
+  completed_plans: 11
   percent: 50
 ---
 
@@ -59,6 +59,7 @@ Progress: [█████░░░░░] 50%
 | Phase 03-preview-interaction P03 | 0 | 2 tasks | 2 files |
 | Phase 04-polish P01 | 33 | 2 tasks | 4 files |
 | Phase 04-polish P02 | 5 | 2 tasks | 3 files |
+| Phase 04-polish P03 | 35 | 2 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -97,6 +98,8 @@ Recent decisions affecting current work:
 - [Phase 04-polish]: Cone base edge (corner1 to corner2) deferred per CONTEXT.md — only two side edges get GS_TRISTRIP treatment in plan 04-01
 - [Phase 04-polish]: chalk_hotkey_laser (hold-key) removed; replaced with chalk_hotkey_tool_laser (tool selection, press-only) — laser behavior now driven by mouse-down/up via input begin/end
 - [Phase 04-polish]: obs_source_info designated initializers must be in struct declaration order (C++ -Werror); get_defaults/get_properties/update sit between get_height and video_render
+- [Phase 04-polish]: Laser dot rendering changed from GS_LINESTRIP to GS_TRIS filled circle — visible at any stroke width
+- [Phase 04-polish]: pick_delete_mode boolean removed; delete now exits when any tool hotkey fires (selecting any tool exits delete)
 
 ### Pending Todos
 
@@ -109,6 +112,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-09T03:06:26.563Z
-Stopped at: Completed 04-02-PLAN.md — cone alpha, persistent delete, laser-as-tool, clear-on-scene-transition
+Last session: 2026-04-09T03:42:39.994Z
+Stopped at: Completed 04-03-PLAN.md — all Phase 4 behaviors verified in OBS
 Resume file: None

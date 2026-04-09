@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Plugin Scaffold and Core Rendering** - OBS plugin loads with a transparent overlay, mutex-protected mark list, and freehand drawing proving the render loop (completed 2026-03-30)
 - [x] **Phase 2: Drawing Tools, Mark Lifecycle, and Hotkeys** - All drawing tools functional, mark management (undo, delete, clear) wired, all primary actions registered as OBS hotkeys (completed 2026-03-30)
 - [x] **Phase 3: Preview Interaction** - Qt event filter on OBS preview widget, coordinate mapping, chalk mode hotkey toggle, pen/tablet pressure, custom cursor (completed 2026-04-08)
-- [ ] **Phase 4: Polish** - Line width consistency, cone opacity fix, persistent delete mode, laser pointer as selectable tool, scene-transition clear
+- [x] **Phase 4: Polish** - Line width consistency, cone opacity fix, persistent delete mode, laser pointer as selectable tool, scene-transition clear (completed 2026-04-09)
 - [ ] **Phase 5: Status Indicator and Distribution** - Read-only dock panel showing tool/color/mode state, macOS codesigned build, Windows x64 build
 
 ## Phase Details
@@ -77,7 +77,7 @@ Plans:
   3. Delete mode stays active across multiple clicks until explicitly toggled off; each click removes the closest mark
   4. Laser pointer is selectable as a tool; with chalk mode active, mouse-down shows the laser dot, mouse-up hides it
   5. When clear-on-scene-transition is enabled, switching scenes removes all marks; with it disabled, marks persist
-**Plans:** 2/3 plans executed
+**Plans:** 3/3 plans complete
 Plans:
 - [ ] 04-01-PLAN.md — Triangle strip rendering for arrow, circle, and cone edges at 6px width
 - [ ] 04-02-PLAN.md — Cone alpha fix, persistent delete, laser-as-tool, and scene-transition clear
@@ -104,5 +104,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 (optional)
 | 1. Plugin Scaffold and Core Rendering | 2/2 | Complete   | 2026-03-30 |
 | 2. Drawing Tools, Mark Lifecycle, and Hotkeys | 3/3 | Complete   | 2026-03-30 |
 | 3. Preview Interaction | 3/3 | Complete   | 2026-04-08 |
-| 4. Polish | 2/3 | In Progress|  |
+| 4. Polish | 3/3 | Complete   | 2026-04-09 |
 | 5. Status Indicator and Distribution | 0/TBD | Not started | - |
