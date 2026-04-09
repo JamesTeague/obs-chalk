@@ -50,7 +50,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Integration
 
-- [ ] **INTG-01**: Optional clear-on-scene-transition (off by default, configurable in source settings)
+- [x] **INTG-01**: Optional clear-on-scene-transition (off by default, configurable in source settings)
 
 ### Distribution
 
@@ -117,7 +117,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PREV-02 | Phase 3 | Complete |
 | PREV-03 | Phase 3 | Complete |
 | PREV-04 | Phase 3 | Complete |
-| INTG-01 | Phase 4 | Pending |
+| INTG-01 | Phase 4 | Complete |
 | DIST-01 | Phase 4 | Pending |
 | DIST-02 | Phase 4 | Pending |
 | UI-01 | Phase 5 (optional) | Pending |
