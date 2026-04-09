@@ -36,13 +36,10 @@ void chalk_input_begin(ChalkSource *ctx, float x, float y, float pressure)
     float r, g, b, a;
     color_uint32_to_rgba(ctx->tool_state.active_color(), r, g, b, a);
 
-    // Pick-to-delete mode: remove closest mark (stays active until hotkey toggled off)
-    if (ctx->pick_delete_mode) {
-        ctx->mark_list.delete_closest(x, y, 20.0f);
-        return;
-    }
-
     switch (ctx->tool_state.active_tool) {
+        case ToolType::Delete:
+            ctx->mark_list.delete_closest(x, y, 20.0f);
+            return;
         case ToolType::Freehand: {
             auto mark = std::make_unique<FreehandMark>(r, g, b, a);
             mark->add_point(x, y, pressure);
@@ -261,13 +258,12 @@ static void chalk_hotkey_tool_laser(void *data, obs_hotkey_id,
     static_cast<ChalkSource *>(data)->tool_state.active_tool = ToolType::Laser;
 }
 
-// Pick-to-delete: toggle mode (MARK-02 entry)
-static void chalk_hotkey_pick_delete(void *data, obs_hotkey_id,
+// Delete tool: select delete as active tool (MARK-02)
+static void chalk_hotkey_tool_delete(void *data, obs_hotkey_id,
                                       obs_hotkey_t *, bool pressed)
 {
     if (!pressed) return;
-    auto *ctx = static_cast<ChalkSource *>(data);
-    ctx->pick_delete_mode = !ctx->pick_delete_mode;
+    static_cast<ChalkSource *>(data)->tool_state.active_tool = ToolType::Delete;
 }
 
 // ---------------------------------------------------------------------------
@@ -316,9 +312,9 @@ static void *chalk_create(obs_data_t *settings, obs_source_t *source)
         source, "chalk.tool.cone", "Chalk: Cone",
         chalk_hotkey_tool_cone, ctx);
 
-    ctx->hotkey_pick_delete = obs_hotkey_register_source(
-        source, "chalk.pick_delete", "Chalk: Pick to Delete",
-        chalk_hotkey_pick_delete, ctx);
+    ctx->hotkey_tool_delete = obs_hotkey_register_source(
+        source, "chalk.tool.delete", "Chalk: Delete",
+        chalk_hotkey_tool_delete, ctx);
 
     return ctx;
 }
@@ -336,7 +332,7 @@ static void chalk_destroy(void *data)
     obs_hotkey_unregister(ctx->hotkey_tool_arrow);
     obs_hotkey_unregister(ctx->hotkey_tool_circle);
     obs_hotkey_unregister(ctx->hotkey_tool_cone);
-    obs_hotkey_unregister(ctx->hotkey_pick_delete);
+    obs_hotkey_unregister(ctx->hotkey_tool_delete);
 
     delete ctx;
 }
@@ -400,7 +396,7 @@ static void chalk_video_render(void *data, gs_effect_t * /* effect */)
         }
     }
 
-    // Laser pointer: colored circle while Laser tool is selected and mouse held
+    // Laser pointer: filled circle while Laser tool is selected and mouse held
     if (ctx->laser_active && ctx->tool_state.active_tool == ToolType::Laser) {
         float lx, ly;
         {
@@ -415,14 +411,20 @@ static void chalk_video_render(void *data, gs_effect_t * /* effect */)
         gs_effect_set_vec4(color_param, &laser_color);
         const float LASER_RADIUS   = 8.0f;
         const int   LASER_SEGMENTS = 16;
+        // Filled circle via triangle fan: center + ring vertices
         gs_render_start(false);
-        for (int i = 0; i <= LASER_SEGMENTS; ++i) {
-            float angle = static_cast<float>(i) / LASER_SEGMENTS
-                          * 2.0f * static_cast<float>(M_PI);
-            gs_vertex2f(lx + LASER_RADIUS * cosf(angle),
-                        ly + LASER_RADIUS * sinf(angle));
+        for (int i = 0; i < LASER_SEGMENTS; ++i) {
+            float a0 = static_cast<float>(i) / LASER_SEGMENTS
+                       * 2.0f * static_cast<float>(M_PI);
+            float a1 = static_cast<float>(i + 1) / LASER_SEGMENTS
+                       * 2.0f * static_cast<float>(M_PI);
+            gs_vertex2f(lx, ly); // center
+            gs_vertex2f(lx + LASER_RADIUS * cosf(a0),
+                        ly + LASER_RADIUS * sinf(a0));
+            gs_vertex2f(lx + LASER_RADIUS * cosf(a1),
+                        ly + LASER_RADIUS * sinf(a1));
         }
-        gs_render_stop(GS_LINESTRIP);
+        gs_render_stop(GS_TRIS);
     }
 
     gs_technique_end_pass(tech);

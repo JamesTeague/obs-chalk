@@ -7,6 +7,7 @@ enum class ToolType : uint8_t {
     Circle,
     Cone,
     Laser,
+    Delete,
 };
 
 static constexpr uint32_t CHALK_PALETTE[] = {

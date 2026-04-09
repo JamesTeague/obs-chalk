@@ -31,15 +31,12 @@ struct ChalkSource {
     obs_hotkey_id hotkey_tool_circle      = OBS_INVALID_HOTKEY_ID;
     obs_hotkey_id hotkey_tool_cone        = OBS_INVALID_HOTKEY_ID;
     obs_hotkey_id hotkey_tool_laser       = OBS_INVALID_HOTKEY_ID;
-    obs_hotkey_id hotkey_pick_delete      = OBS_INVALID_HOTKEY_ID;
+    obs_hotkey_id hotkey_tool_delete      = OBS_INVALID_HOTKEY_ID;
 
     // Laser pointer state
     bool  laser_active = false;
     float laser_x      = 0.f;
     float laser_y      = 0.f;
-
-    // Pick-to-delete mode
-    bool pick_delete_mode = false;
 
     // Scene-transition settings
     bool clear_on_scene_change = false;
