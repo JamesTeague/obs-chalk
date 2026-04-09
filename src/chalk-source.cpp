@@ -166,25 +166,31 @@ static void chalk_mouse_click(void *data,
 static void chalk_mouse_move(void *data,
                              const struct obs_mouse_event *event,
                              bool mouse_leave);
+static void chalk_get_defaults(obs_data_t *settings);
+static obs_properties_t *chalk_get_properties(void *data);
+static void chalk_update(void *data, obs_data_t *settings);
 
 // ---------------------------------------------------------------------------
 // obs_source_info registration
 // ---------------------------------------------------------------------------
 
 struct obs_source_info chalk_source_info = {
-    .id          = "chalk_drawing_source",
-    .type        = OBS_SOURCE_TYPE_INPUT,
-    .output_flags = OBS_SOURCE_VIDEO
-                  | OBS_SOURCE_INTERACTION
-                  | OBS_SOURCE_CUSTOM_DRAW,
-    .get_name    = chalk_get_name,
-    .create      = chalk_create,
-    .destroy     = chalk_destroy,
-    .get_width   = chalk_get_width,
-    .get_height  = chalk_get_height,
-    .video_render = chalk_video_render,
-    .mouse_click = chalk_mouse_click,
-    .mouse_move  = chalk_mouse_move,
+    .id             = "chalk_drawing_source",
+    .type           = OBS_SOURCE_TYPE_INPUT,
+    .output_flags   = OBS_SOURCE_VIDEO
+                    | OBS_SOURCE_INTERACTION
+                    | OBS_SOURCE_CUSTOM_DRAW,
+    .get_name       = chalk_get_name,
+    .create         = chalk_create,
+    .destroy        = chalk_destroy,
+    .get_width      = chalk_get_width,
+    .get_height     = chalk_get_height,
+    .get_defaults   = chalk_get_defaults,
+    .get_properties = chalk_get_properties,
+    .update         = chalk_update,
+    .video_render   = chalk_video_render,
+    .mouse_click    = chalk_mouse_click,
+    .mouse_move     = chalk_mouse_move,
 };
 
 // ---------------------------------------------------------------------------
@@ -273,9 +279,10 @@ static const char *chalk_get_name(void * /* type_data */)
     return obs_module_text("obs-chalk");
 }
 
-static void *chalk_create(obs_data_t * /* settings */, obs_source_t *source)
+static void *chalk_create(obs_data_t *settings, obs_source_t *source)
 {
     auto *ctx = new ChalkSource(source);
+    chalk_update(ctx, settings);  // read initial settings
 
     ctx->hotkey_undo = obs_hotkey_register_source(
         source, "chalk.undo", "Chalk: Undo",
@@ -332,6 +339,26 @@ static void chalk_destroy(void *data)
     obs_hotkey_unregister(ctx->hotkey_pick_delete);
 
     delete ctx;
+}
+
+static void chalk_get_defaults(obs_data_t *settings)
+{
+    obs_data_set_default_bool(settings, "clear_on_scene_change", false);
+}
+
+static obs_properties_t *chalk_get_properties(void * /* data */)
+{
+    obs_properties_t *props = obs_properties_create();
+    obs_properties_add_bool(props, "clear_on_scene_change",
+                            obs_module_text("ClearOnSceneChange"));
+    return props;
+}
+
+static void chalk_update(void *data, obs_data_t *settings)
+{
+    auto *ctx = static_cast<ChalkSource *>(data);
+    ctx->clear_on_scene_change =
+        obs_data_get_bool(settings, "clear_on_scene_change");
 }
 
 static uint32_t chalk_get_width(void * /* data */)

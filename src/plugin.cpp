@@ -1,6 +1,7 @@
 #include <obs-module.h>
 #include <obs-frontend-api.h>
 #include "chalk-mode.hpp"
+#include "chalk-source.hpp"
 
 OBS_DECLARE_MODULE()
 OBS_MODULE_USE_DEFAULT_LOCALE("obs-chalk", "en-US")
@@ -13,6 +14,12 @@ static void on_obs_event(obs_frontend_event event, void *)
         chalk_mode_install();
     else if (event == OBS_FRONTEND_EVENT_EXIT)
         chalk_mode_shutdown();
+    else if (event == OBS_FRONTEND_EVENT_SCENE_CHANGED) {
+        ChalkSource *ctx = chalk_find_source();
+        if (ctx && ctx->clear_on_scene_change) {
+            ctx->mark_list.clear_all();
+        }
+    }
 }
 
 bool obs_module_load(void)

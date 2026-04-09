@@ -41,5 +41,8 @@ struct ChalkSource {
     // Pick-to-delete mode
     bool pick_delete_mode = false;
 
+    // Scene-transition settings
+    bool clear_on_scene_change = false;
+
     explicit ChalkSource(obs_source_t *src) : source(src) {}
 };
