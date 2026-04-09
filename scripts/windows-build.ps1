@@ -76,7 +76,7 @@ Push-Location $RepoDir
 
 # Find vcvarsall.bat to set up MSVC environment
 $vsWhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
-$vsPath = & $vsWhere -latest -property installationPath 2>$null
+$vsPath = & $vsWhere -latest -products * -property installationPath 2>$null
 if (-not $vsPath) {
     Write-Host "ERROR: Could not find Visual Studio installation." -ForegroundColor Red
     Pop-Location
