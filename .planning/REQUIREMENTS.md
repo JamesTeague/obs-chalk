@@ -45,7 +45,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### UI (Optional)
 
-- [ ] **UI-01**: Qt dock panel in OBS for tool selection and color palette display
+- [x] **UI-01**: Qt dock panel in OBS for tool selection and color palette display
 - [ ] **UI-02**: Dock panel shows current active tool and selected color
 
 ### Integration
@@ -120,7 +120,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INTG-01 | Phase 4 | Complete |
 | DIST-01 | Phase 4 | Pending |
 | DIST-02 | Phase 4 | Pending |
-| UI-01 | Phase 5 (optional) | Pending |
+| UI-01 | Phase 5 (optional) | Complete |
 | UI-02 | Phase 5 (optional) | Pending |
 
 **Coverage:**

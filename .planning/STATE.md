@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: verifying
-stopped_at: Completed 04-03-PLAN.md — all Phase 4 behaviors verified in OBS
-last_updated: "2026-04-09T03:48:23.982Z"
+stopped_at: Completed 05-01-PLAN.md — ChalkDock status panel built and integrated
+last_updated: "2026-04-09T13:41:27.166Z"
 last_activity: 2026-04-08 — Plan 03-01 complete, event filter installed, build clean
 progress:
   total_phases: 5
   completed_phases: 4
-  total_plans: 11
-  completed_plans: 11
+  total_plans: 13
+  completed_plans: 12
   percent: 50
 ---
 
@@ -60,6 +60,7 @@ Progress: [█████░░░░░] 50%
 | Phase 04-polish P01 | 33 | 2 tasks | 4 files |
 | Phase 04-polish P02 | 5 | 2 tasks | 3 files |
 | Phase 04-polish P03 | 35 | 2 tasks | 1 files |
+| Phase 05-status-indicator-and-distribution P01 | 2 | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -100,6 +101,9 @@ Recent decisions affecting current work:
 - [Phase 04-polish]: obs_source_info designated initializers must be in struct declaration order (C++ -Werror); get_defaults/get_properties/update sit between get_height and video_render
 - [Phase 04-polish]: Laser dot rendering changed from GS_LINESTRIP to GS_TRIS filled circle — visible at any stroke width
 - [Phase 04-polish]: pick_delete_mode boolean removed; delete now exits when any tool hotkey fires (selecting any tool exits delete)
+- [Phase 05-status-indicator-and-distribution]: QTimer polling at 100ms chosen for ChalkDock — avoids signals/slots coupling to hotkey dispatch path, simpler reasoning, adequate frequency
+- [Phase 05-status-indicator-and-distribution]: cmake --preset macos re-configure required after adding new source to CMakeLists.txt — Xcode project does not update from build alone
+- [Phase 05-status-indicator-and-distribution]: Dock install/shutdown: OBS owns widget after obs_frontend_add_dock_by_id — never delete, only null the pointer in shutdown
 
 ### Pending Todos
 
@@ -112,6 +116,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-09T03:42:39.994Z
-Stopped at: Completed 04-03-PLAN.md — all Phase 4 behaviors verified in OBS
+Last session: 2026-04-09T13:41:27.163Z
+Stopped at: Completed 05-01-PLAN.md — ChalkDock status panel built and integrated
 Resume file: None
