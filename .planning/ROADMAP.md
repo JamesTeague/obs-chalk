@@ -92,7 +92,10 @@ Plans:
   2. Dock panel updates in real-time when state changes via hotkey or stream deck
   3. macOS build is codesigned and notarized; plugin installs without Gatekeeper warnings
   4. Windows x64 build produces a loadable plugin DLL that runs in OBS on the streaming machine
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 05-01-PLAN.md — ChalkDock widget with QTimer polling and chalk-mode lifecycle integration
+- [ ] 05-02-PLAN.md — Distribution pipeline validation via CI tag push and platform verification
 
 ## Progress
 
@@ -105,4 +108,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 (optional)
 | 2. Drawing Tools, Mark Lifecycle, and Hotkeys | 3/3 | Complete   | 2026-03-30 |
 | 3. Preview Interaction | 3/3 | Complete   | 2026-04-08 |
 | 4. Polish | 3/3 | Complete   | 2026-04-09 |
-| 5. Status Indicator and Distribution | 0/TBD | Not started | - |
+| 5. Status Indicator and Distribution | 0/2 | Planned | - |
