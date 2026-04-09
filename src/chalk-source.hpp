@@ -26,11 +26,11 @@ struct ChalkSource {
     obs_hotkey_id hotkey_undo             = OBS_INVALID_HOTKEY_ID;
     obs_hotkey_id hotkey_clear            = OBS_INVALID_HOTKEY_ID;
     obs_hotkey_id hotkey_color            = OBS_INVALID_HOTKEY_ID;
-    obs_hotkey_id hotkey_laser            = OBS_INVALID_HOTKEY_ID;
     obs_hotkey_id hotkey_tool_freehand    = OBS_INVALID_HOTKEY_ID;
     obs_hotkey_id hotkey_tool_arrow       = OBS_INVALID_HOTKEY_ID;
     obs_hotkey_id hotkey_tool_circle      = OBS_INVALID_HOTKEY_ID;
     obs_hotkey_id hotkey_tool_cone        = OBS_INVALID_HOTKEY_ID;
+    obs_hotkey_id hotkey_tool_laser       = OBS_INVALID_HOTKEY_ID;
     obs_hotkey_id hotkey_pick_delete      = OBS_INVALID_HOTKEY_ID;
 
     // Laser pointer state

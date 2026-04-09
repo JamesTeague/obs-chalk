@@ -4,6 +4,20 @@
 #include <cmath>
 #include <limits>
 
+static void draw_thick_segment(float x1, float y1, float x2, float y2, float half_w)
+{
+    float dx = x2 - x1, dy = y2 - y1;
+    float len = std::hypot(dx, dy);
+    if (len < 1e-6f) return;
+    float px = -dy / len, py = dx / len;
+    gs_render_start(false);
+    gs_vertex2f(x1 + px * half_w, y1 + py * half_w);
+    gs_vertex2f(x1 - px * half_w, y1 - py * half_w);
+    gs_vertex2f(x2 + px * half_w, y2 + py * half_w);
+    gs_vertex2f(x2 - px * half_w, y2 - py * half_w);
+    gs_render_stop(GS_TRISTRIP);
+}
+
 ArrowMark::ArrowMark(float x1, float y1, float x2, float y2,
                      float r, float g, float b, float a)
     : x1_(x1), y1_(y1), x2_(x2), y2_(y2)
@@ -27,11 +41,10 @@ void ArrowMark::draw(gs_eparam_t *color_param) const
 
     gs_effect_set_vec4(color_param, &color_);
 
+    const float HALF_W = 3.0f;
+
     // Shaft
-    gs_render_start(false);
-    gs_vertex2f(x1_, y1_);
-    gs_vertex2f(x2_, y2_);
-    gs_render_stop(GS_LINESTRIP);
+    draw_thick_segment(x1_, y1_, x2_, y2_, HALF_W);
 
     // Arrowhead arms (30 degrees = 0.5236 rad from reversed shaft direction)
     float angle = std::atan2(dy, dx);
@@ -41,18 +54,12 @@ void ArrowMark::draw(gs_eparam_t *color_param) const
     // Left arm
     float la_x = x2_ + ARM_LEN * std::cos(angle + static_cast<float>(M_PI) - ARM_ANGLE);
     float la_y = y2_ + ARM_LEN * std::sin(angle + static_cast<float>(M_PI) - ARM_ANGLE);
-    gs_render_start(false);
-    gs_vertex2f(x2_, y2_);
-    gs_vertex2f(la_x, la_y);
-    gs_render_stop(GS_LINESTRIP);
+    draw_thick_segment(x2_, y2_, la_x, la_y, HALF_W);
 
     // Right arm
     float ra_x = x2_ + ARM_LEN * std::cos(angle + static_cast<float>(M_PI) + ARM_ANGLE);
     float ra_y = y2_ + ARM_LEN * std::sin(angle + static_cast<float>(M_PI) + ARM_ANGLE);
-    gs_render_start(false);
-    gs_vertex2f(x2_, y2_);
-    gs_vertex2f(ra_x, ra_y);
-    gs_render_stop(GS_LINESTRIP);
+    draw_thick_segment(x2_, y2_, ra_x, ra_y, HALF_W);
 }
 
 float ArrowMark::distance_to(float x, float y) const

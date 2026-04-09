@@ -36,10 +36,9 @@ void chalk_input_begin(ChalkSource *ctx, float x, float y, float pressure)
     float r, g, b, a;
     color_uint32_to_rgba(ctx->tool_state.active_color(), r, g, b, a);
 
-    // Pick-to-delete mode: remove closest mark and auto-exit
+    // Pick-to-delete mode: remove closest mark (stays active until hotkey toggled off)
     if (ctx->pick_delete_mode) {
         ctx->mark_list.delete_closest(x, y, 20.0f);
-        ctx->pick_delete_mode = false;
         return;
     }
 
@@ -64,18 +63,17 @@ void chalk_input_begin(ChalkSource *ctx, float x, float y, float pressure)
             break;
         }
         case ToolType::Cone: {
-            auto mark = std::make_unique<ConeMark>(x, y, x, y, r, g, b, a);
+            auto mark = std::make_unique<ConeMark>(x, y, x, y, r, g, b, 0.35f);
             ctx->mark_list.begin_mark(std::move(mark));
             ctx->drawing = true;
             break;
         }
         case ToolType::Laser:
-            // Laser is not a mark — also update laser position
-            {
-                std::lock_guard<std::mutex> lock(ctx->mark_list.mutex);
-                ctx->laser_x = x;
-                ctx->laser_y = y;
-            }
+            // Laser is not a mark — show dot while mouse button held
+            ctx->laser_active = true;
+            ctx->laser_x = x;
+            ctx->laser_y = y;
+            ctx->drawing = true;
             break;
     }
 }
@@ -98,8 +96,12 @@ void chalk_input_move(ChalkSource *ctx, float x, float y, float pressure)
 }
 
 // End a stroke: commit the in-progress mark and clear drawing flag.
+// For the Laser tool, hide the dot (commit_mark is a no-op when in_progress is nullptr).
 void chalk_input_end(ChalkSource *ctx)
 {
+    if (ctx->tool_state.active_tool == ToolType::Laser) {
+        ctx->laser_active = false;
+    }
     ctx->mark_list.commit_mark();
     ctx->drawing = false;
 }
@@ -217,15 +219,6 @@ static void chalk_hotkey_color(void *data, obs_hotkey_id,
         (ctx->tool_state.color_index + 1) % CHALK_PALETTE_SIZE;
 }
 
-// Laser pointer: active while key held, off on release (TOOL-05)
-// Does NOT early-return on !pressed — key-up disables the laser.
-static void chalk_hotkey_laser(void *data, obs_hotkey_id,
-                                obs_hotkey_t *, bool pressed)
-{
-    auto *ctx = static_cast<ChalkSource *>(data);
-    ctx->laser_active = pressed;
-}
-
 // Tool selection hotkeys
 static void chalk_hotkey_tool_freehand(void *data, obs_hotkey_id,
                                         obs_hotkey_t *, bool pressed)
@@ -289,7 +282,7 @@ static void *chalk_create(obs_data_t * /* settings */, obs_source_t *source)
         source, "chalk.color_next", "Chalk: Next Color",
         chalk_hotkey_color, ctx);
 
-    ctx->hotkey_laser = obs_hotkey_register_source(
+    ctx->hotkey_tool_laser = obs_hotkey_register_source(
         source, "chalk.laser", "Chalk: Laser Pointer",
         chalk_hotkey_laser, ctx);
 
@@ -324,7 +317,7 @@ static void chalk_destroy(void *data)
     obs_hotkey_unregister(ctx->hotkey_undo);
     obs_hotkey_unregister(ctx->hotkey_clear);
     obs_hotkey_unregister(ctx->hotkey_color);
-    obs_hotkey_unregister(ctx->hotkey_laser);
+    obs_hotkey_unregister(ctx->hotkey_tool_laser);
     obs_hotkey_unregister(ctx->hotkey_tool_freehand);
     obs_hotkey_unregister(ctx->hotkey_tool_arrow);
     obs_hotkey_unregister(ctx->hotkey_tool_circle);
