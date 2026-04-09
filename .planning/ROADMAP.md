@@ -15,8 +15,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Plugin Scaffold and Core Rendering** - OBS plugin loads with a transparent overlay, mutex-protected mark list, and freehand drawing proving the render loop (completed 2026-03-30)
 - [x] **Phase 2: Drawing Tools, Mark Lifecycle, and Hotkeys** - All drawing tools functional, mark management (undo, delete, clear) wired, all primary actions registered as OBS hotkeys (completed 2026-03-30)
 - [x] **Phase 3: Preview Interaction** - Qt event filter on OBS preview widget, coordinate mapping, chalk mode hotkey toggle, pen/tablet pressure, custom cursor (completed 2026-04-08)
-- [ ] **Phase 4: Polish and Distribution** - Scene-transition clear, macOS codesigned build, Windows x64 build
-- [ ] **Phase 5: Dock Panel** (OPTIONAL) - Qt dock panel with tool selection, color palette display, and active state indicators
+- [ ] **Phase 4: Polish** - Line width consistency, cone opacity fix, persistent delete mode, laser pointer as selectable tool, scene-transition clear
+- [ ] **Phase 5: Status Indicator and Distribution** - Read-only dock panel showing tool/color/mode state, macOS codesigned build, Windows x64 build
 
 ## Phase Details
 
@@ -67,23 +67,31 @@ Plans:
 - [ ] 03-02-PLAN.md — Tablet pressure sensitivity for variable-width freehand strokes
 - [ ] 03-03-PLAN.md — OBS verification of all Phase 3 requirements
 
-### Phase 4: Polish and Distribution
-**Goal**: The plugin is ready for real stream use on both macOS and Windows with scene-transition clear and platform builds
+### Phase 4: Polish
+**Goal**: Drawing UX matches film review workflow — consistent line weight, transparent cones, persistent delete mode, laser pointer as a proper tool, and auto-clear on scene transitions
 **Depends on**: Phase 3
-**Requirements**: INTG-01, DIST-01, DIST-02
+**Requirements**: INTG-01, UX-01, UX-02, UX-03, UX-04
 **Success Criteria** (what must be TRUE):
-  1. When the optional clear-on-scene-transition setting is enabled, switching scenes removes all marks; with it disabled, marks persist across scene switches
-  2. macOS build is codesigned and notarized; plugin installs from a .pkg or .zip without Gatekeeper warnings
-  3. Windows x64 build produces a loadable plugin DLL that installs and runs in OBS on the streaming machine
-**Plans**: TBD
+  1. Arrow, circle, and cone edge marks render at the same visual weight as freehand strokes drawn with a mouse (~6px)
+  2. Cone fill is visibly transparent — canvas content is clearly visible through the cone interior
+  3. Delete mode stays active across multiple clicks until explicitly toggled off; each click removes the closest mark
+  4. Laser pointer is selectable as a tool; with chalk mode active, mouse-down shows the laser dot, mouse-up hides it
+  5. When clear-on-scene-transition is enabled, switching scenes removes all marks; with it disabled, marks persist
+**Plans:** 3 plans
+Plans:
+- [ ] 04-01-PLAN.md — Triangle strip rendering for arrow, circle, and cone edges at 6px width
+- [ ] 04-02-PLAN.md — Cone alpha fix, persistent delete, laser-as-tool, and scene-transition clear
+- [ ] 04-03-PLAN.md — OBS verification of all Phase 4 requirements
 
-### Phase 5: Dock Panel (OPTIONAL)
-**Goal**: Users who prefer a visual control surface can use a Qt dock panel for tool selection and color palette
-**Depends on**: Phase 3
-**Requirements**: UI-01, UI-02
+### Phase 5: Status Indicator and Distribution
+**Goal**: A read-only dock panel shows current tool/color/mode state, and platform builds make the plugin installable on macOS and Windows
+**Depends on**: Phase 4
+**Requirements**: UI-01, DIST-01, DIST-02
 **Success Criteria** (what must be TRUE):
-  1. Dock panel appears in OBS UI with buttons for each tool and a color swatch palette; dock persists across OBS restarts
-  2. Dock panel visually reflects the currently active tool and selected color when either changes (via hotkey or dock click)
+  1. Dock panel appears in OBS UI showing the active tool, selected color, and chalk mode state; persists across OBS restarts
+  2. Dock panel updates in real-time when state changes via hotkey or stream deck
+  3. macOS build is codesigned and notarized; plugin installs without Gatekeeper warnings
+  4. Windows x64 build produces a loadable plugin DLL that runs in OBS on the streaming machine
 **Plans**: TBD
 
 ## Progress
@@ -96,5 +104,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 (optional)
 | 1. Plugin Scaffold and Core Rendering | 2/2 | Complete   | 2026-03-30 |
 | 2. Drawing Tools, Mark Lifecycle, and Hotkeys | 3/3 | Complete   | 2026-03-30 |
 | 3. Preview Interaction | 3/3 | Complete   | 2026-04-08 |
-| 4. Polish and Distribution | 0/TBD | Not started | - |
-| 5. Dock Panel (OPTIONAL) | 0/TBD | Not started | - |
+| 4. Polish | 0/3 | In progress | - |
+| 5. Status Indicator and Distribution | 0/TBD | Not started | - |
