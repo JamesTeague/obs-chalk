@@ -25,6 +25,12 @@
 #include <QWidget>
 #include <QGuiApplication>
 
+#ifdef _WIN32
+#include <QAbstractNativeEventFilter>
+#include <QCoreApplication>
+#include <windows.h>
+#endif
+
 // ---------------------------------------------------------------------------
 // Coordinate mapping
 // ---------------------------------------------------------------------------
@@ -92,6 +98,12 @@ static ChalkDock          *s_dock                 = nullptr;
 class ChalkEventFilter;
 static ChalkEventFilter   *s_filter               = nullptr;
 
+#ifdef _WIN32
+class ChalkNativeFilter;
+static ChalkNativeFilter  *s_native_filter         = nullptr;
+static HWND                s_preview_hwnd           = nullptr;
+#endif
+
 // ---------------------------------------------------------------------------
 // Cursor helper
 // ---------------------------------------------------------------------------
@@ -126,6 +138,79 @@ static void chalk_mode_hotkey_cb(void *, obs_hotkey_id, obs_hotkey_t *, bool pre
     s_chalk_mode_active = !s_chalk_mode_active;
     chalk_update_cursor();
 }
+
+// ---------------------------------------------------------------------------
+// ChalkNativeFilter — Win32 mouse message interception (Windows only)
+//
+// Qt eventFilter does not receive mouse events on Windows because
+// OBSQTDisplay sets WA_NativeWindow, creating a separate HWND that
+// dispatches messages directly to the widget. This native event filter
+// intercepts WM_LBUTTONDOWN/MOVE/UP before Qt processes them.
+// ---------------------------------------------------------------------------
+
+#ifdef _WIN32
+class ChalkNativeFilter : public QAbstractNativeEventFilter {
+public:
+    bool nativeEventFilter(const QByteArray &eventType,
+                           void *message,
+                           qintptr *result) override
+    {
+        if (eventType != "windows_generic_MSG")
+            return false;
+
+        auto *msg = static_cast<MSG *>(message);
+
+        // Only intercept messages targeted at the preview HWND
+        if (msg->hwnd != s_preview_hwnd)
+            return false;
+
+        // Only intercept when chalk mode is active
+        if (!s_chalk_mode_active)
+            return false;
+
+        switch (msg->message) {
+        case WM_LBUTTONDOWN: {
+            // lParam client coords are in physical pixels on Windows.
+            // Cast through short to handle negative coords (drag outside window).
+            float client_x = static_cast<float>(static_cast<short>(LOWORD(msg->lParam)));
+            float client_y = static_cast<float>(static_cast<short>(HIWORD(msg->lParam)));
+            // Convert physical -> logical pixels (preview_widget_to_scene expects logical)
+            float dpr = static_cast<float>(s_preview->devicePixelRatioF());
+            float logical_x = client_x / dpr;
+            float logical_y = client_y / dpr;
+            vec2 pos = preview_widget_to_scene(s_preview, logical_x, logical_y);
+            ChalkSource *ctx = chalk_find_source();
+            if (ctx) chalk_input_begin(ctx, pos.x, pos.y);
+            *result = 0;
+            return true;
+        }
+        case WM_MOUSEMOVE: {
+            // Only intercept if left button is held
+            if (!(msg->wParam & MK_LBUTTON))
+                return false;
+            float client_x = static_cast<float>(static_cast<short>(LOWORD(msg->lParam)));
+            float client_y = static_cast<float>(static_cast<short>(HIWORD(msg->lParam)));
+            float dpr = static_cast<float>(s_preview->devicePixelRatioF());
+            float logical_x = client_x / dpr;
+            float logical_y = client_y / dpr;
+            vec2 pos = preview_widget_to_scene(s_preview, logical_x, logical_y);
+            ChalkSource *ctx = chalk_find_source();
+            if (ctx) chalk_input_move(ctx, pos.x, pos.y);
+            *result = 0;
+            return true;
+        }
+        case WM_LBUTTONUP: {
+            ChalkSource *ctx = chalk_find_source();
+            if (ctx) chalk_input_end(ctx);
+            *result = 0;
+            return true;
+        }
+        default:
+            return false;
+        }
+    }
+};
+#endif
 
 // ---------------------------------------------------------------------------
 // ChalkEventFilter — Q_OBJECT class defined in .cpp (requires #include "chalk-mode.moc")
@@ -259,6 +344,14 @@ void chalk_mode_install()
     s_filter = new ChalkEventFilter(s_preview);
     s_preview->installEventFilter(s_filter);
 
+#ifdef _WIN32
+    s_preview_hwnd = reinterpret_cast<HWND>(s_preview->winId());
+    s_native_filter = new ChalkNativeFilter();
+    QCoreApplication::instance()->installNativeEventFilter(s_native_filter);
+    blog(LOG_INFO, "obs-chalk: native event filter installed for preview HWND %p",
+         static_cast<void *>(s_preview_hwnd));
+#endif
+
     // Register global chalk mode hotkey.
     // NOTE: Registering here (FINISHED_LOADING) rather than obs_module_load means
     // saved bindings from scene collection will NOT be restored on restart.
@@ -287,6 +380,15 @@ void chalk_mode_shutdown()
         obs_frontend_remove_dock("chalk-status");
         s_dock = nullptr; // OBS owns widget — do NOT delete
     }
+
+#ifdef _WIN32
+    if (s_native_filter) {
+        QCoreApplication::instance()->removeNativeEventFilter(s_native_filter);
+        delete s_native_filter;
+        s_native_filter = nullptr;
+        s_preview_hwnd = nullptr;
+    }
+#endif
 
     if (s_preview && s_filter) {
         s_preview->removeEventFilter(s_filter);
