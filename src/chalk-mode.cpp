@@ -150,6 +150,7 @@ protected:
                 return handle_tablet(static_cast<QTabletEvent *>(event));
 
             case QEvent::MouseButtonPress: {
+                blog(LOG_INFO, "obs-chalk: eventFilter got MouseButtonPress");
                 auto *me = static_cast<QMouseEvent *>(event);
                 if (me->button() == Qt::LeftButton) {
                     vec2 pos = preview_widget_to_scene(
@@ -281,7 +282,10 @@ void chalk_mode_install()
         chalk_mode_hotkey_cb,
         nullptr);
 
-    blog(LOG_INFO, "obs-chalk: chalk mode installed on preview widget");
+    blog(LOG_INFO, "obs-chalk: chalk mode installed on preview widget "
+         "(class=%s, children=%d)",
+         s_preview->metaObject()->className(),
+         s_preview->children().size());
 
     s_dock = new ChalkDock();
     obs_frontend_add_dock_by_id("chalk-status",
