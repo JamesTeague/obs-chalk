@@ -150,7 +150,6 @@ protected:
                 return handle_tablet(static_cast<QTabletEvent *>(event));
 
             case QEvent::MouseButtonPress: {
-                blog(LOG_INFO, "obs-chalk: eventFilter got MouseButtonPress");
                 auto *me = static_cast<QMouseEvent *>(event);
                 if (me->button() == Qt::LeftButton) {
                     vec2 pos = preview_widget_to_scene(
@@ -251,21 +250,9 @@ void chalk_mode_install()
 
     s_preview = main->findChild<QWidget *>("preview");
     if (!s_preview) {
-        // Dump child widget names to help diagnose platform differences
-        auto children = main->findChildren<QWidget *>();
         blog(LOG_WARNING,
-             "obs-chalk: could not find widget named 'preview'; "
-             "dumping %d child widget names:", children.size());
-        for (auto *child : children) {
-            if (!child->objectName().isEmpty()) {
-                blog(LOG_WARNING, "obs-chalk:   widget: '%s' (%s)",
-                     child->objectName().toUtf8().constData(),
-                     child->metaObject()->className());
-            }
-        }
-        blog(LOG_WARNING,
-             "obs-chalk: event filter not installed "
-             "(source interaction callbacks still work)");
+             "obs-chalk: could not find preview widget; "
+             "event filter not installed (source interaction callbacks still work)");
         return;
     }
 
@@ -285,7 +272,7 @@ void chalk_mode_install()
     blog(LOG_INFO, "obs-chalk: chalk mode installed on preview widget "
          "(class=%s, children=%d)",
          s_preview->metaObject()->className(),
-         s_preview->children().size());
+         static_cast<int>(s_preview->children().size()));
 
     s_dock = new ChalkDock();
     obs_frontend_add_dock_by_id("chalk-status",
