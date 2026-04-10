@@ -250,9 +250,21 @@ void chalk_mode_install()
 
     s_preview = main->findChild<QWidget *>("preview");
     if (!s_preview) {
+        // Dump child widget names to help diagnose platform differences
+        auto children = main->findChildren<QWidget *>();
         blog(LOG_WARNING,
-             "obs-chalk: chalk_mode_install — could not find preview widget; "
-             "event filter not installed (source interaction callbacks still work)");
+             "obs-chalk: could not find widget named 'preview'; "
+             "dumping %d child widget names:", children.size());
+        for (auto *child : children) {
+            if (!child->objectName().isEmpty()) {
+                blog(LOG_WARNING, "obs-chalk:   widget: '%s' (%s)",
+                     child->objectName().toUtf8().constData(),
+                     child->metaObject()->className());
+            }
+        }
+        blog(LOG_WARNING,
+             "obs-chalk: event filter not installed "
+             "(source interaction callbacks still work)");
         return;
     }
 
