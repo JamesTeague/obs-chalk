@@ -55,7 +55,7 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Distribution
 
 - [ ] **DIST-01**: macOS universal binary (Intel + Apple Silicon)
-- [ ] **DIST-02**: Windows x64 build
+- [x] **DIST-02**: Windows x64 build
 
 ## v2 Requirements
 
@@ -119,7 +119,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PREV-04 | Phase 3 | Complete |
 | INTG-01 | Phase 4 | Complete |
 | DIST-01 | Phase 4 | Pending |
-| DIST-02 | Phase 4 | Pending |
+| DIST-02 | Phase 4 | Complete |
 | UI-01 | Phase 5 (optional) | Complete |
 | UI-02 | Phase 5 (optional) | Pending |
 

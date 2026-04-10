@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: verifying
-stopped_at: Completed 05-01-PLAN.md — ChalkDock status panel built and integrated
-last_updated: "2026-04-09T13:41:27.166Z"
-last_activity: 2026-04-08 — Plan 03-01 complete, event filter installed, build clean
+status: completed
+stopped_at: Completed 05-03-PLAN.md
+last_updated: "2026-04-10T21:59:50.215Z"
+last_activity: 2026-04-10 — Plan 05-03 complete, ChalkNativeFilter for Win32 preview mouse, build clean
 progress:
   total_phases: 5
   completed_phases: 4
-  total_plans: 13
-  completed_plans: 12
-  percent: 50
+  total_plans: 14
+  completed_plans: 13
+  percent: 93
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-23)
 
 **Core value:** Coaches can reliably draw on film during a livestream without the tool crashing or disrupting the broadcast.
-**Current focus:** Phase 3 — Preview Interaction
+**Current focus:** Phase 5 — Status Indicator and Distribution
 
 ## Current Position
 
-Phase: 3 of 4 (Preview Interaction)
-Plan: 1 of 3 in current phase (complete)
-Status: Completed — Plan 03-01 done, ready for plan 03-02 (tablet pressure) or 03-03 (verification checkpoint)
-Last activity: 2026-04-08 — Plan 03-01 complete, event filter installed, build clean
+Phase: 5 of 5 (Status Indicator and Distribution)
+Plan: 3 of 3 in current phase (complete)
+Status: Completed — Plan 05-03 done, Windows native event filter added, diagnostic logging cleaned up
+Last activity: 2026-04-10 — Plan 05-03 complete, ChalkNativeFilter for Win32 preview mouse, build clean
 
-Progress: [█████░░░░░] 50%
+Progress: [█████████░] 93%
 
 ## Performance Metrics
 
@@ -61,6 +61,7 @@ Progress: [█████░░░░░] 50%
 | Phase 04-polish P02 | 5 | 2 tasks | 3 files |
 | Phase 04-polish P03 | 35 | 2 tasks | 1 files |
 | Phase 05-status-indicator-and-distribution P01 | 2 | 2 tasks | 5 files |
+| Phase 05-status-indicator-and-distribution P03 | 3 | 2 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -104,6 +105,8 @@ Recent decisions affecting current work:
 - [Phase 05-status-indicator-and-distribution]: QTimer polling at 100ms chosen for ChalkDock — avoids signals/slots coupling to hotkey dispatch path, simpler reasoning, adequate frequency
 - [Phase 05-status-indicator-and-distribution]: cmake --preset macos re-configure required after adding new source to CMakeLists.txt — Xcode project does not update from build alone
 - [Phase 05-status-indicator-and-distribution]: Dock install/shutdown: OBS owns widget after obs_frontend_add_dock_by_id — never delete, only null the pointer in shutdown
+- [Phase 05-status-indicator-and-distribution]: LOWORD/HIWORD with short cast for Win32 lParam coords — handles negative coords when dragging outside window, avoids windowsx.h dependency
+- [Phase 05-status-indicator-and-distribution]: Physical-to-logical pixel conversion via devicePixelRatio before preview_widget_to_scene — function expects logical pixels and multiplies by dpr internally
 
 ### Pending Todos
 
@@ -116,6 +119,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-09T13:41:27.163Z
-Stopped at: Completed 05-01-PLAN.md — ChalkDock status panel built and integrated
+Last session: 2026-04-10T21:59:49.031Z
+Stopped at: Completed 05-03-PLAN.md
 Resume file: None
