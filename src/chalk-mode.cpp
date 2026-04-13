@@ -165,7 +165,7 @@ public:
             msg->message != WM_LBUTTONUP)
             return false;
 
-        if (!s_chalk_mode_active)
+        if (!s_chalk_mode_active || !s_preview)
             return false;
 
         // HWND matching fails on Windows — the display surface creates
@@ -179,6 +179,7 @@ public:
         QPoint previewOrigin = s_preview->mapToGlobal(QPoint(0, 0));
         int pw = s_preview->width();
         int ph = s_preview->height();
+        if (pw < 1 || ph < 1) return false;
         float rel_x = static_cast<float>(screenPt.x - previewOrigin.x());
         float rel_y = static_cast<float>(screenPt.y - previewOrigin.y());
 
@@ -186,27 +187,27 @@ public:
             return false;
 
         // rel_x/rel_y are in logical pixels relative to preview widget
+        ChalkSource *ctx = chalk_find_source();
+        if (!ctx) return false;
+
         switch (msg->message) {
         case WM_LBUTTONDOWN: {
             vec2 pos = preview_widget_to_scene(s_preview, rel_x, rel_y);
-            ChalkSource *ctx = chalk_find_source();
-            if (ctx) chalk_input_begin(ctx, pos.x, pos.y);
-            *result = 0;
+            chalk_input_begin(ctx, pos.x, pos.y);
+            if (result) *result = 0;
             return true;
         }
         case WM_MOUSEMOVE: {
             if (!(msg->wParam & MK_LBUTTON))
                 return false;
             vec2 pos = preview_widget_to_scene(s_preview, rel_x, rel_y);
-            ChalkSource *ctx = chalk_find_source();
-            if (ctx) chalk_input_move(ctx, pos.x, pos.y);
-            *result = 0;
+            chalk_input_move(ctx, pos.x, pos.y);
+            if (result) *result = 0;
             return true;
         }
         case WM_LBUTTONUP: {
-            ChalkSource *ctx = chalk_find_source();
-            if (ctx) chalk_input_end(ctx);
-            *result = 0;
+            chalk_input_end(ctx);
+            if (result) *result = 0;
             return true;
         }
         default:
