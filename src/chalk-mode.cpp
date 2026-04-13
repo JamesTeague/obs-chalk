@@ -182,6 +182,14 @@ public:
         float rel_x = static_cast<float>(screenPt.x - previewOrigin.x());
         float rel_y = static_cast<float>(screenPt.y - previewOrigin.y());
 
+        if (msg->message == WM_LBUTTONDOWN) {
+            blog(LOG_INFO, "obs-chalk: DIAG screen=(%ld,%ld) preview=(%d,%d)+%dx%d rel=(%.0f,%.0f) dpr=%.2f",
+                 screenPt.x, screenPt.y,
+                 previewOrigin.x(), previewOrigin.y(), pw, ph,
+                 rel_x, rel_y,
+                 s_preview->devicePixelRatioF());
+        }
+
         if (rel_x < 0 || rel_y < 0 || rel_x >= pw || rel_y >= ph)
             return false;
 
