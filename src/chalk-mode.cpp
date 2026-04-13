@@ -160,6 +160,18 @@ public:
 
         auto *msg = static_cast<MSG *>(message);
 
+        // Diagnostic: log the first left-click HWND to compare against cached preview
+        if (msg->message == WM_LBUTTONDOWN) {
+            static bool logged = false;
+            if (!logged) {
+                blog(LOG_INFO, "obs-chalk: DIAG click hwnd=%p preview_hwnd=%p isChild=%d",
+                     static_cast<void *>(msg->hwnd),
+                     static_cast<void *>(s_preview_hwnd),
+                     IsChild(s_preview_hwnd, msg->hwnd));
+                logged = false;  // keep logging for now
+            }
+        }
+
         // Only intercept messages targeted at the preview HWND or its children.
         // OBSQTDisplay creates child HWNDs for the rendering surface — mouse
         // events target those, not the parent widget HWND.
