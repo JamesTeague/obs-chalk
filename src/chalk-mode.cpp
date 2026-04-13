@@ -182,14 +182,6 @@ public:
         float rel_x = static_cast<float>(screenPt.x - previewOrigin.x());
         float rel_y = static_cast<float>(screenPt.y - previewOrigin.y());
 
-        if (msg->message == WM_LBUTTONDOWN) {
-            blog(LOG_INFO, "obs-chalk: DIAG screen=(%ld,%ld) preview=(%d,%d)+%dx%d rel=(%.0f,%.0f) dpr=%.2f",
-                 screenPt.x, screenPt.y,
-                 previewOrigin.x(), previewOrigin.y(), pw, ph,
-                 rel_x, rel_y,
-                 s_preview->devicePixelRatioF());
-        }
-
         if (rel_x < 0 || rel_y < 0 || rel_x >= pw || rel_y >= ph)
             return false;
 
@@ -345,28 +337,23 @@ void chalk_mode_install()
         return;
     }
 
-    s_preview = main->findChild<QWidget *>("preview");
+    // OBS has multiple widgets named "preview". The real one is OBSBasicPreview
+    // (visible, large). findChild returns the first match which may be a hidden
+    // OBSQTDisplay stub. Find all and pick the visible one with the largest area.
+    QList<QWidget *> candidates = main->findChildren<QWidget *>("preview");
+    for (QWidget *w : candidates) {
+        if (w->isVisible() && w->width() > 100 && w->height() > 100) {
+            s_preview = w;
+            break;
+        }
+    }
+    if (!s_preview && !candidates.isEmpty())
+        s_preview = candidates.last(); // fallback
     if (!s_preview) {
         blog(LOG_WARNING,
              "obs-chalk: could not find preview widget; "
              "event filter not installed (source interaction callbacks still work)");
         return;
-    }
-
-    // Log all OBSQTDisplay widgets to find the real preview
-    QList<QWidget *> displays = main->findChildren<QWidget *>();
-    for (QWidget *w : displays) {
-        QString cls = w->metaObject()->className();
-        if (cls.contains("Display") || cls.contains("Preview") ||
-            w->objectName() == "preview") {
-            QPoint gp = w->mapToGlobal(QPoint(0, 0));
-            blog(LOG_INFO, "obs-chalk: DIAG widget name='%s' class='%s' "
-                 "geo=(%d,%d)+%dx%d visible=%d",
-                 w->objectName().toUtf8().constData(),
-                 w->metaObject()->className(),
-                 gp.x(), gp.y(), w->width(), w->height(),
-                 w->isVisible());
-        }
     }
 
     s_filter = new ChalkEventFilter(s_preview);
