@@ -101,7 +101,6 @@ static ChalkEventFilter   *s_filter               = nullptr;
 #ifdef _WIN32
 class ChalkNativeFilter;
 static ChalkNativeFilter  *s_native_filter         = nullptr;
-static HWND                s_preview_hwnd           = nullptr;
 #endif
 
 // ---------------------------------------------------------------------------
@@ -160,55 +159,45 @@ public:
 
         auto *msg = static_cast<MSG *>(message);
 
-        // Diagnostic: log the first left-click HWND to compare against cached preview
-        if (msg->message == WM_LBUTTONDOWN) {
-            static bool logged = false;
-            if (!logged) {
-                blog(LOG_INFO, "obs-chalk: DIAG click hwnd=%p preview_hwnd=%p isChild=%d",
-                     static_cast<void *>(msg->hwnd),
-                     static_cast<void *>(s_preview_hwnd),
-                     IsChild(s_preview_hwnd, msg->hwnd));
-                logged = false;  // keep logging for now
-            }
-        }
-
-        // Only intercept messages targeted at the preview HWND or its children.
-        // OBSQTDisplay creates child HWNDs for the rendering surface — mouse
-        // events target those, not the parent widget HWND.
-        if (msg->hwnd != s_preview_hwnd &&
-            !IsChild(s_preview_hwnd, msg->hwnd))
+        // Early exit for non-mouse messages
+        if (msg->message != WM_LBUTTONDOWN &&
+            msg->message != WM_MOUSEMOVE &&
+            msg->message != WM_LBUTTONUP)
             return false;
 
-        // Only intercept when chalk mode is active
         if (!s_chalk_mode_active)
             return false;
 
+        // HWND matching fails on Windows — the display surface creates
+        // unrelated HWNDs. Instead, convert event coords to screen space
+        // and check if they fall within the preview widget's bounds.
+        POINT screenPt;
+        screenPt.x = static_cast<short>(LOWORD(msg->lParam));
+        screenPt.y = static_cast<short>(HIWORD(msg->lParam));
+        ClientToScreen(msg->hwnd, &screenPt);
+
+        QPoint previewOrigin = s_preview->mapToGlobal(QPoint(0, 0));
+        int pw = s_preview->width();
+        int ph = s_preview->height();
+        float rel_x = static_cast<float>(screenPt.x - previewOrigin.x());
+        float rel_y = static_cast<float>(screenPt.y - previewOrigin.y());
+
+        if (rel_x < 0 || rel_y < 0 || rel_x >= pw || rel_y >= ph)
+            return false;
+
+        // rel_x/rel_y are in logical pixels relative to preview widget
         switch (msg->message) {
         case WM_LBUTTONDOWN: {
-            // lParam client coords are in physical pixels on Windows.
-            // Cast through short to handle negative coords (drag outside window).
-            float client_x = static_cast<float>(static_cast<short>(LOWORD(msg->lParam)));
-            float client_y = static_cast<float>(static_cast<short>(HIWORD(msg->lParam)));
-            // Convert physical -> logical pixels (preview_widget_to_scene expects logical)
-            float dpr = static_cast<float>(s_preview->devicePixelRatioF());
-            float logical_x = client_x / dpr;
-            float logical_y = client_y / dpr;
-            vec2 pos = preview_widget_to_scene(s_preview, logical_x, logical_y);
+            vec2 pos = preview_widget_to_scene(s_preview, rel_x, rel_y);
             ChalkSource *ctx = chalk_find_source();
             if (ctx) chalk_input_begin(ctx, pos.x, pos.y);
             *result = 0;
             return true;
         }
         case WM_MOUSEMOVE: {
-            // Only intercept if left button is held
             if (!(msg->wParam & MK_LBUTTON))
                 return false;
-            float client_x = static_cast<float>(static_cast<short>(LOWORD(msg->lParam)));
-            float client_y = static_cast<float>(static_cast<short>(HIWORD(msg->lParam)));
-            float dpr = static_cast<float>(s_preview->devicePixelRatioF());
-            float logical_x = client_x / dpr;
-            float logical_y = client_y / dpr;
-            vec2 pos = preview_widget_to_scene(s_preview, logical_x, logical_y);
+            vec2 pos = preview_widget_to_scene(s_preview, rel_x, rel_y);
             ChalkSource *ctx = chalk_find_source();
             if (ctx) chalk_input_move(ctx, pos.x, pos.y);
             *result = 0;
@@ -360,11 +349,9 @@ void chalk_mode_install()
     s_preview->installEventFilter(s_filter);
 
 #ifdef _WIN32
-    s_preview_hwnd = reinterpret_cast<HWND>(s_preview->winId());
     s_native_filter = new ChalkNativeFilter();
     QCoreApplication::instance()->installNativeEventFilter(s_native_filter);
-    blog(LOG_INFO, "obs-chalk: native event filter installed for preview HWND %p",
-         static_cast<void *>(s_preview_hwnd));
+    blog(LOG_INFO, "obs-chalk: native event filter installed (geometry-based matching)");
 #endif
 
     // Register global chalk mode hotkey.
@@ -401,7 +388,6 @@ void chalk_mode_shutdown()
         QCoreApplication::instance()->removeNativeEventFilter(s_native_filter);
         delete s_native_filter;
         s_native_filter = nullptr;
-        s_preview_hwnd = nullptr;
     }
 #endif
 
