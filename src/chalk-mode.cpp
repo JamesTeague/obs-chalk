@@ -160,8 +160,11 @@ public:
 
         auto *msg = static_cast<MSG *>(message);
 
-        // Only intercept messages targeted at the preview HWND
-        if (msg->hwnd != s_preview_hwnd)
+        // Only intercept messages targeted at the preview HWND or its children.
+        // OBSQTDisplay creates child HWNDs for the rendering surface — mouse
+        // events target those, not the parent widget HWND.
+        if (msg->hwnd != s_preview_hwnd &&
+            !IsChild(s_preview_hwnd, msg->hwnd))
             return false;
 
         // Only intercept when chalk mode is active
