@@ -38,53 +38,58 @@ void FreehandMark::draw(gs_eparam_t *color_param) const
 
     gs_effect_set_vec4(color_param, &color_);
 
-    // Render as a variable-width triangle strip.
-    // For each segment, compute perpendicular offsets at half-width and emit
-    // two vertices per point (one on each side of the stroke centerline).
-    gs_render_start(false);
+    // OBS immediate-mode rendering has a 512-vertex limit (D3D11 backend).
+    // Each point emits 2 vertices, so batch at 250 points (500 verts) max.
+    // Overlap by 1 point at batch boundaries to maintain strip continuity.
+    static constexpr size_t BATCH_POINTS = 250;
 
-    for (size_t i = 0; i < points_.size(); ++i) {
-        const auto &pt = points_[i];
+    size_t start = 0;
+    while (start < points_.size()) {
+        size_t end = std::min(start + BATCH_POINTS, points_.size());
+        if (end - start < 2) break;
 
-        // Compute the along-stroke direction at this point.
-        // Use the direction to the next point, or the previous point at the end.
-        float dx, dy;
-        if (i + 1 < points_.size()) {
-            dx = points_[i + 1].x - pt.x;
-            dy = points_[i + 1].y - pt.y;
-        } else {
-            dx = pt.x - points_[i - 1].x;
-            dy = pt.y - points_[i - 1].y;
-        }
+        gs_render_start(false);
 
-        float len = std::hypot(dx, dy);
-        if (len < 1e-6f) {
-            // Degenerate segment — use previous direction or fall back to axis
-            if (i > 0) {
+        for (size_t i = start; i < end; ++i) {
+            const auto &pt = points_[i];
+
+            float dx, dy;
+            if (i + 1 < points_.size()) {
+                dx = points_[i + 1].x - pt.x;
+                dy = points_[i + 1].y - pt.y;
+            } else {
                 dx = pt.x - points_[i - 1].x;
                 dy = pt.y - points_[i - 1].y;
-                len = std::hypot(dx, dy);
             }
+
+            float len = std::hypot(dx, dy);
             if (len < 1e-6f) {
-                dx = 1.0f;
-                dy = 0.0f;
-                len = 1.0f;
+                if (i > 0) {
+                    dx = pt.x - points_[i - 1].x;
+                    dy = pt.y - points_[i - 1].y;
+                    len = std::hypot(dx, dy);
+                }
+                if (len < 1e-6f) {
+                    dx = 1.0f;
+                    dy = 0.0f;
+                    len = 1.0f;
+                }
             }
+
+            float px = -dy / len;
+            float py =  dx / len;
+
+            float half_w = 0.5f * (CHALK_MIN_WIDTH + pt.pressure * (CHALK_MAX_WIDTH - CHALK_MIN_WIDTH));
+
+            gs_vertex2f(pt.x + px * half_w, pt.y + py * half_w);
+            gs_vertex2f(pt.x - px * half_w, pt.y - py * half_w);
         }
 
-        // Perpendicular unit vector (rotated 90 degrees)
-        float px = -dy / len;
-        float py =  dx / len;
+        gs_render_stop(GS_TRISTRIP);
 
-        // Half-width at this point based on pressure
-        float half_w = 0.5f * (CHALK_MIN_WIDTH + pt.pressure * (CHALK_MAX_WIDTH - CHALK_MIN_WIDTH));
-
-        // Two vertices: one on each side of the centerline
-        gs_vertex2f(pt.x + px * half_w, pt.y + py * half_w);
-        gs_vertex2f(pt.x - px * half_w, pt.y - py * half_w);
+        // Overlap by 1 point so the next batch connects seamlessly
+        start = end - 1;
     }
-
-    gs_render_stop(GS_TRISTRIP);
 }
 
 float FreehandMark::distance_to(float x, float y) const
