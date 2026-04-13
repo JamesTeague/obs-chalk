@@ -353,6 +353,22 @@ void chalk_mode_install()
         return;
     }
 
+    // Log all OBSQTDisplay widgets to find the real preview
+    QList<QWidget *> displays = main->findChildren<QWidget *>();
+    for (QWidget *w : displays) {
+        QString cls = w->metaObject()->className();
+        if (cls.contains("Display") || cls.contains("Preview") ||
+            w->objectName() == "preview") {
+            QPoint gp = w->mapToGlobal(QPoint(0, 0));
+            blog(LOG_INFO, "obs-chalk: DIAG widget name='%s' class='%s' "
+                 "geo=(%d,%d)+%dx%d visible=%d",
+                 w->objectName().toUtf8().constData(),
+                 w->metaObject()->className(),
+                 gp.x(), gp.y(), w->width(), w->height(),
+                 w->isVisible());
+        }
+    }
+
     s_filter = new ChalkEventFilter(s_preview);
     s_preview->installEventFilter(s_filter);
 
@@ -362,10 +378,6 @@ void chalk_mode_install()
     blog(LOG_INFO, "obs-chalk: native event filter installed (geometry-based matching)");
 #endif
 
-    // Register global chalk mode hotkey.
-    // NOTE: Registering here (FINISHED_LOADING) rather than obs_module_load means
-    // saved bindings from scene collection will NOT be restored on restart.
-    // Move to obs_module_load if binding persistence is required (see research Pitfall 6).
     s_chalk_mode_hotkey = obs_hotkey_register_frontend(
         "chalk.chalk_mode",
         "Chalk: Toggle Chalk Mode",
@@ -373,9 +385,11 @@ void chalk_mode_install()
         nullptr);
 
     blog(LOG_INFO, "obs-chalk: chalk mode installed on preview widget "
-         "(class=%s, children=%d)",
+         "(class=%s, geo=(%d,%d)+%dx%d)",
          s_preview->metaObject()->className(),
-         static_cast<int>(s_preview->children().size()));
+         s_preview->mapToGlobal(QPoint(0, 0)).x(),
+         s_preview->mapToGlobal(QPoint(0, 0)).y(),
+         s_preview->width(), s_preview->height());
 
     s_dock = new ChalkDock();
     obs_frontend_add_dock_by_id("chalk-status",
